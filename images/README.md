@@ -1,4 +1,4 @@
-### Images
+# Images
 
 The docker images as based on [ryshe/terraria](https://github.com/ryansheehan/terraria) but come 
 with a few improvements.
@@ -12,6 +12,6 @@ with a few improvements.
   - `tshock` - where tshock plugins store things?
 - The `-worldpath` and `-world` options now work consistently for vanilla and tshock images
 
-#### Notes
+## Notes
 
 The helm charts expect images with these modifications and will not work properly otherwise. 
