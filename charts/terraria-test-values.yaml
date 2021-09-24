@@ -1,0 +1,22 @@
+extraInitContainers:
+  download-plugins:
+    image: cybermaxke/tools:alpine-3.14.2
+    imagePullPolicy: IfNotPresent
+    command:
+      - sh
+      - -c
+      - |
+        cd /plugins
+        curl -L https://github.com/Rozen4334/ChatManager/releases/download/v1.1/ChatManager.zip -o chat-manager.zip
+        unzip chat-manager.zip -d .
+        rm chat-manager.zip
+    volumeMounts:
+      - name: plugins
+        mountPath: /plugins
+
+world:
+  persistentVolume:
+    enabled: false
+
+# image:
+#   tag: vanilla-latest

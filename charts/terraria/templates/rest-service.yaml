@@ -1,0 +1,24 @@
+{{- if and (include "terraria.tshock" .) .Values.rest.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "terraria.fullname" . }}-rest
+  {{- include "terraria.namespace" . | nindent 2 }}
+  labels:
+    {{- include "terraria.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.rest.service.type }}
+  {{- with .Values.rest.service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
+  ports:
+    - port: {{ .Values.rest.service.port }}
+      targetPort: rest
+      name: rest
+      protocol: TCP
+      {{- with .Values.rest.service.nodePort }}
+      nodePort: {{ . }}
+      {{- end }}
+  selector:
+    {{- include "terraria.selectorLabels" . | nindent 4 }}
+{{- end }}

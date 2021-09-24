@@ -1,0 +1,143 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "terraria.fullname" . }}
+  {{- include "terraria.namespace" . | nindent 2 }}
+  labels:
+    {{- include "terraria.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "terraria.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "terraria.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "terraria.serviceAccountName" . }}
+      restartPolicy: {{ .Values.server.restartPolicy }}
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      volumes:
+        - name: server-config
+          configMap:
+            name: {{ include "terraria.fullname" . }}
+        - name: tshock-config
+          configMap:
+            name: {{ include "terraria.fullname" . }}
+        - name: worlds
+          {{- if .Values.world.persistentVolume.enabled }}
+          persistentVolumeClaim:
+            {{- $claimName := "" }}
+            {{- if .Values.world.persistentVolume.existingClaim }}
+            {{- $claimName = tpl .Values.world.persistentVolume.existingClaim . }}
+            {{- else }}
+            {{- $claimName = printf "%s-worlds" (include "terraria.fullname" .) }}
+            {{- end }}
+            claimName: {{ $claimName }}
+          {{- else }}
+          emptyDir:
+            {{- if .Values.world.emptyDir.sizeLimit }}
+            sizeLimit: {{ .Values.world.emptyDir.sizeLimit }}
+            {{- else }}
+            {}
+            {{- end -}}
+          {{- end }}
+        - name: plugins
+          emptyDir: {}
+        - name: logs
+          emptyDir: {}
+        - name: config
+          emptyDir: {}
+      initContainers:
+        {{- if .Values.extraInitContainers }}
+        {{- range $name, $spec := .Values.extraInitContainers }}
+        - name: {{ $name }}
+          {{- if kindIs "string" $spec }}
+          {{- tpl $spec $ | nindent 10 }}
+          {{- else }}
+          {{- toYaml $spec | nindent 10 }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if include "terraria.tshock" . }}
+        - name: copy-tshock-config
+          {{- include "terraria.toolsImage" . | nindent 10 }}
+          command:
+            - sh
+            - -c
+            - |
+              cp /tshock-config/config.json /config
+              echo "Copied tshock config file"
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: tshock-config
+              mountPath: /tshock-config
+        {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: {{ tpl .Values.image.terraria.repository . }}:{{ tpl .Values.image.terraria.tag . }}
+          imagePullPolicy: {{ default .Values.image.pullPolicy .Values.image.terraria.pullPolicy }}
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+          {{- /* Stdin must be set to true, or the container will crash after generating the world */}}
+          stdin: true
+          args:
+            - -config serverconfig.txt
+            - -announcementboxrange '{{ .Values.announcementBox.range }}'
+            {{- if not .Values.announcementBox.enabled }}
+            - -disableannouncementbox
+            {{- end }}
+          volumeMounts:
+            - name: server-config
+              mountPath: /home/terraria/server/serverconfig.txt
+              subPath: serverconfig.txt
+            - name: worlds
+              mountPath: /home/terraria/server/worlds
+            - name: plugins
+              mountPath: /home/terraria/server/plugins
+            - name: logs
+              mountPath: /home/terraria/server/logs
+            - name: config
+              mountPath: /home/terraria/server/config
+          ports:
+            - containerPort: 7777
+              name: server
+            {{- if and (include "terraria.tshock" .) .Values.rest.enabled }}
+            - containerPort: 7878
+              name: rest
+            {{- end }}
+          startupProbe:
+            {{- include "terraria.livenessCheck" . | nindent 12 }}
+            {{- include "terraria.probeValues" .Values.startupProbe | nindent 12 }}
+          livenessProbe:
+            {{- include "terraria.livenessCheck" . | nindent 12 }}
+            {{- include "terraria.probeValues" .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- include "terraria.livenessCheck" . | nindent 12 }}
+            {{- include "terraria.probeValues" .Values.readinessProbe | nindent 12 }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

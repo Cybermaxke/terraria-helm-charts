@@ -1,0 +1,20 @@
+{{- if .Values.world.persistentVolume.enabled -}}
+{{- if not .Values.world.persistentVolume.existingClaim -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "terraria.fullname" . }}-worlds
+  {{- include "terraria.namespace" . | nindent 2 }}
+  labels:
+    {{- include "terraria.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    {{- toYaml .Values.world.persistentVolume.accessModes | nindent 4 }}
+  {{- if .Values.world.persistentVolume.volumeBindingMode }}
+  volumeBindingModeName: {{ .Values.world.persistentVolume.volumeBindingMode }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.world.persistentVolume.size }}
+{{- end }}
+{{- end }}

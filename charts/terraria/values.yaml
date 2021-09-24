@@ -1,0 +1,251 @@
+# Default values for Terraria.
+
+server:
+  # Service settings
+  service:
+    type: NodePort
+
+    # The service port
+    port: 7777
+
+    # The port the server will be exposed as externally, if the service type is "NodePort", this
+    # will be the fixed port instead of a random one in the node port range
+    nodePort: null
+
+    # Load balancer IP, if service type is "LoadBalancer"
+    loadBalancerIP: null
+
+  # The name of the server
+  name: "{{ .Release.Name }}"
+
+  # If debug messages should be logged
+  debugLoggingEnabled: false
+
+  # Language of the server:
+  #  - English = en-US
+  #  - German = de-DE
+  #  - Italian = it-IT
+  #  - French = fr-FR
+  #  - Spanish = es-ES
+  #  - Russian = ru-RU
+  #  - Chinese = zh-Hans
+  #  - Portuguese = pt-BR
+  #  - Polish = pl-PL
+  language: en-US
+
+  # Maximum number of allowed players
+  maxPlayers:
+    # Default number of max players, for non-reserved player slots
+    base: 8
+
+    # Number of reserved player slots past the default that can be joined by reserved players
+    #  tshock-only
+    reserved: 20
+
+  # Password of the server
+  password: null
+
+  # The restart policy applied to the server pod
+  restartPolicy: Always
+
+# Additional protection against cheats
+antiCheatProtection:
+  # If additional cheat protection is enabled
+  enabled: true
+
+  # If range checks based on distance between players and their block placements are enabled
+  #  tshock-only
+  rangeChecks: true
+
+# Prevents non-hardcore players from connecting
+#  tshock-only
+hardcoreOnly: false
+
+# Prevents softcore players from connecting
+#  tshock-only
+mediumcoreOnly: false
+
+# Spawn protection
+#  tshock-only
+spawnProtection:
+  # If tiles are protected around the spawn tile
+  enabled: true
+
+  # Tile radius around the spawn tile
+  radius: 10
+
+# Hardmode
+#  tshock-only
+hardmode:
+  # If hardmode can be triggered by the Wall of Flesh or the /starthardmode command
+  triggerable: true
+
+  # Allows the crimson to spread when a world is in hardmode
+  spreadCrimson: true
+
+  # Allows the corruption to spread when a world is in hardmode
+  spreadCorruption: true
+
+  # Allows the hallow to spread when a world is in hardmode
+  spreadHallow: true
+
+announcementBox:
+  # If the text announcements the Announcement Box makes when pulsed from wire are enabled
+  enabled: true
+
+  # The announcement box text messaging range in pixels, -1 for server-wide announcements
+  range: -1
+
+world:
+  # World name, used for the world save file
+  name: "{{ .Release.Name }}"
+
+  # World size: small, medium, large
+  size: small
+
+  # World difficulty: classic, expert, master or journey
+  difficulty: classic
+
+  # Rollbacks to keep
+  rollbacksToKeep: 2
+
+  # Seed used to generate the world, null to use a random seed
+  seed: null
+
+  # Reduces maximum liquids moving at the same time. If enabled may reduce lags but liquids may
+  # take longer to settle
+  slowLiquids: false
+
+  # Persistent volume where the worlds are stored
+  persistentVolume:
+    # If a persistent volume should be used to store worlds, otherwise uses emptyDir
+    enabled: true
+
+    # The persistent volume access modes
+    # Must match those of existing PV or dynamic provisioner
+    # Ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+    accessModes:
+      - ReadWriteOnce
+
+    # An existing persistent volume claim name, will be used instead of the default one
+    # If defined, the persistent volume claim must be created manually before volume will be bound
+    existingClaim: null
+
+    # The size of the persistent volume
+    size: 2Gi
+
+    # The volume binding mode
+    # If undefined, the default mode will be used.
+    volumeBindingMode: null
+
+  # Worlds empty dir
+  emptyDir:
+    # Volume size limit
+    sizeLimit: null
+
+# Rest Service
+#  tshock-only
+rest:
+  # If the rest service is enabled, is ignored if not tshock
+  enabled: false
+
+  # If rest connections should be logged
+  loggingEnabled: false
+
+  # The maximum REST requests in the bucket before denying requests, minimum value is 5
+  maxRequestsPerInterval: 5
+
+  # How often in minutes the REST requests bucket is decreased by one, minimum value is 1 minute
+  requestBucketDecreaseIntervalMinutes: 1
+
+  service:
+    type: NodePort
+
+    # The port the rest api will be exposed as externally, if the service type is "NodePort", this
+    # will be the fixed port instead of a random one in the node port range
+    port: 7878
+
+    # The port the rest api will be exposed as externally, if the service type is "NodePort", this
+    # will be the fixed port instead of a random one in the node port range
+    nodePort: null
+
+    # Load balancer IP, if service type is "LoadBalancer"
+    loadBalancerIP: null
+
+image:
+  # The pull policy that is used for all images, unless overridden for a specific image
+  pullPolicy: IfNotPresent
+
+  # The pull secrets
+  pullSecrets: []
+
+  # The terraria server image
+  terraria:
+    # The image type: tshock, vanilla, null to derive from image tag
+    type: null
+    repository: cybermaxke/terraria
+    tag: tshock-latest
+    # The pull policy, image.pullPolicy is used if not set
+    pullPolicy: null
+
+  # The tools image
+  tools:
+    repository: cybermaxke/tools
+    tag: alpine-3.14.2
+    # The pull policy, image.pullPolicy is used if not set
+    pullPolicy: null
+
+# Extra init containers that are added to the deployment
+extraInitContainers: {}
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious choice
+  # for the user. This also increases chances charts run on environments with little resources,
+  # such as Minikube. If you do want to specify resources, uncomment the following lines, adjust
+  # them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 1
+  #   memory: 1Gi
+  # requests:
+  #   cpu: 100m
+  #   memory: 512Mi
+
+startupProbe:
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 6
+  successThreshold: 1
+
+livenessProbe:
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 1
+  successThreshold: 1
+
+readinessProbe:
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 1
+  successThreshold: 1
+
+nodeSelector: {}
+
+# Node tolerations for scheduling to nodes with taints
+# Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+tolerations: []
+
+affinity: {}
+
+rbac:
+  # Specifies whether RBAC resources should be created
+  create: true
+
+serviceAccount:
+  # Specifies whether a ServiceAccount should be created
+  create: true
+  # The name of the ServiceAccount to use
+  # If not set and create is true, a name is generated using the fullname template
+  name: null
