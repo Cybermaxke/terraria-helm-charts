@@ -122,7 +122,7 @@ Returns if the deployed image is tshock.
 {{- end }}
 
 {{/*
-Define the namespace template if set with forceNamespace or .Release.Namespace is set
+Define the namespace template if set with forceNamespace or .Release.Namespace is set.
 */}}
 {{- define "terraria.namespace" -}}
 {{- if .Values.forceNamespace -}}
@@ -132,6 +132,9 @@ namespace: {{ .Release.Namespace }}
 {{- end -}}
 {{- end -}}
 
+{{/*
+Define probe values.
+*/}}
 {{- define "terraria.probeValues" -}}
 initialDelaySeconds: {{ .initialDelaySeconds }}
 periodSeconds: {{ .periodSeconds }}
