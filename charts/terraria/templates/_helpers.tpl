@@ -82,6 +82,9 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
+{{/*
+Tools image and pull policy.
+*/}}
 {{- define "terraria.toolsImage" -}}
 image: {{ tpl .Values.image.tools.repository . }}:{{ tpl .Values.image.tools.tag . }}
 imagePullPolicy: {{ default .Values.image.pullPolicy .Values.image.terraria.pullPolicy }}
