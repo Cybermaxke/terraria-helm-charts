@@ -1,0 +1,33 @@
+name: Release Charts
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'charts/terraria/**'
+      - 'charts/terre/**'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Fetch history
+        run: git fetch --prune --unshallow
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+      - name: Set up Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: v3.7.0
+      - name: Add dependency chart repos
+        run: |
+          helm repo add terraria https://cybermaxke.github.io/terraria-helm-charts
+      - name: Release Charts
+        uses: helm/chart-releaser-action@v1.2.1
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
