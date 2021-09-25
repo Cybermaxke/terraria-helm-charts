@@ -24,9 +24,9 @@ jobs:
         uses: azure/setup-helm@v1
         with:
           version: v3.7.0
-#      - name: Add dependency chart repos
-#        run: |
-#          helm repo add terraria https://cybermaxke.github.io/terraria-helm-charts
+      - name: Add dependency chart repos
+        run: |
+          helm repo add terraria https://cybermaxke.github.io/terraria-helm-charts
       - name: Release Charts
         uses: helm/chart-releaser-action@v1.2.1
         env:
