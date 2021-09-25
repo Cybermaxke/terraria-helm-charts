@@ -1,0 +1,15 @@
+apiVersion: v1
+entries:
+  terraria:
+  - apiVersion: v2
+    appVersion: 1.4.2.3
+    created: "2021-09-25T11:33:21.653774226Z"
+    description: A Helm chart for Terraria.
+    digest: 9dea1ef1be039e5b0c9b7385edd21abe9f6447614b7664a5e8a52f3ea8166641
+    icon: https://terraria.org/static/media/logo.734118ae.png
+    name: terraria
+    type: application
+    urls:
+    - https://github.com/Cybermaxke/terraria-helm-charts/releases/download/terraria-0.1.0/terraria-0.1.0.tgz
+    version: 0.1.0
+generated: "2021-09-25T11:33:21.653780926Z"
