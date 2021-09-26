@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - master
-    paths:
-      - images/tshock/**
+#    paths:
+#      - images/tshock/**
 
 jobs:
   build-tshock-image:
@@ -31,5 +31,5 @@ jobs:
           # TODO: Get the version values somewhere?
           tags: |
             cybermaxke/terraria:tshock-latest
-            cybermaxke/terraria:tshock-1.4.2.3-latest
+            cybermaxke/terraria:tshock-1.4.2.3
             cybermaxke/terraria:tshock-1.4.2.3-4.5.5

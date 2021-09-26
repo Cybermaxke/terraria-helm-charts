@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - master
-#    paths:
-#      - images/vanilla/**
+    paths:
+      - images/vanilla/**
 
 jobs:
   build-vanilla-image:
