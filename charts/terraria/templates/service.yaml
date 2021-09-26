@@ -10,6 +10,9 @@ spec:
   {{- with .Values.server.service.loadBalancerIP }}
   loadBalancerIP: {{ . }}
   {{- end }}
+  {{- with .Values.server.service.externalName }}
+  externalName: {{ . }}
+  {{- end }}
   ports:
     - port: {{ .Values.server.service.port }}
       targetPort: server

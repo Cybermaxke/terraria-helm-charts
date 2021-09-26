@@ -36,9 +36,9 @@ spec:
           persistentVolumeClaim:
             {{- $claimName := "" }}
             {{- if .Values.world.persistentVolume.existingClaim }}
-            {{- $claimName = tpl .Values.world.persistentVolume.existingClaim . }}
+              {{- $claimName = tpl .Values.world.persistentVolume.existingClaim . }}
             {{- else }}
-            {{- $claimName = printf "%s-worlds" (include "terraria.fullname" .) }}
+              {{- $claimName = printf "%s-worlds" (include "terraria.fullname" .) }}
             {{- end }}
             claimName: {{ $claimName }}
           {{- else }}
@@ -93,9 +93,19 @@ spec:
           stdin: true
           args:
             - -config serverconfig.txt
-            - -announcementboxrange '{{ .Values.announcementBox.range }}'
+            - -announcementboxrange '{{ default -1 .Values.announcementBox.range }}'
             {{- if not .Values.announcementBox.enabled }}
             - -disableannouncementbox
+            {{- end }}
+            {{- if include "terraria.tshock" . }}
+            - -killinactivesocket
+            - -asyncmono
+            {{- with .Values.server.maxConnectionsPerIP }}
+            - -connperip {{ . }}
+            {{- end }}
+            {{- if .Values.server.forceUpdates }}
+            - -forceupdate
+            {{- end }}
             {{- end }}
           volumeMounts:
             - name: server-config

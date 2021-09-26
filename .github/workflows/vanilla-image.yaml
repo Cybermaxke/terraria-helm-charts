@@ -1,14 +1,14 @@
-name: Build TShock Image
+name: Build Vanilla Image
 
 on:
   push:
     branches:
       - master
-    paths:
-      - images/tshock/**
+#    paths:
+#      - images/vanilla/**
 
 jobs:
-  build-tshock-image:
+  build-vanilla-image:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -25,11 +25,10 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v2
         with:
-          context: ./images/tshock
+          context: ./images/vanilla
           platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm64,linux/ppc64le
           push: true
           # TODO: Get the version values somewhere?
           tags: |
-            cybermaxke/terraria:tshock-latest
-            cybermaxke/terraria:tshock-1.4.2.3-latest
-            cybermaxke/terraria:tshock-1.4.2.3-4.5.5
+            cybermaxke/terraria:vanilla-latest
+            cybermaxke/terraria:vanilla-1.4.2.3

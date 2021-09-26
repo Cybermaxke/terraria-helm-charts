@@ -1,8 +1,12 @@
 # Default values for Terraria.
 
 server:
+
   # Service settings
+  # Ref: https://kubernetes.io/docs/tutorials/kubernetes-basics/expose/expose-intro/
   service:
+
+    # The service type
     type: NodePort
 
     # The service port
@@ -14,6 +18,9 @@ server:
 
     # Load balancer IP, if service type is "LoadBalancer"
     loadBalancerIP: null
+
+    # External name, if service type is "ExternalName"
+    externalName: null
 
   # The name of the server
   name: "{{ .Release.Name }}"
@@ -42,14 +49,22 @@ server:
     #  tshock-only
     reserved: 20
 
+  # The maximum number of connections per IP, or no limit if null
+  maxConnectionsPerIP: null
+
   # Password of the server
   password: null
+
+  # Forces the server to keep updating, and not hibernating when no players are on. This results
+  # in time passing, grass growing, etc.
+  forceUpdates: false
 
   # The restart policy applied to the server pod
   restartPolicy: Always
 
 # Additional protection against cheats
 antiCheatProtection:
+
   # If additional cheat protection is enabled
   enabled: true
 
@@ -68,6 +83,7 @@ mediumcoreOnly: false
 # Spawn protection
 #  tshock-only
 spawnProtection:
+
   # If tiles are protected around the spawn tile
   enabled: true
 
@@ -77,6 +93,7 @@ spawnProtection:
 # Hardmode
 #  tshock-only
 hardmode:
+
   # If hardmode can be triggered by the Wall of Flesh or the /starthardmode command
   triggerable: true
 
@@ -90,13 +107,15 @@ hardmode:
   spreadHallow: true
 
 announcementBox:
+
   # If the text announcements the Announcement Box makes when pulsed from wire are enabled
   enabled: true
 
-  # The announcement box text messaging range in pixels, -1 for server-wide announcements
-  range: -1
+  # The announcement box text messaging range in pixels, null for server-wide announcements
+  range: null
 
 world:
+
   # World name, used for the world save file
   name: "{{ .Release.Name }}"
 
@@ -143,9 +162,17 @@ world:
     # Volume size limit
     sizeLimit: null
 
+# Plugins
+#  tshock-only
+plugins:
+
+  # Whether the API version should be checked, disabling this allows older plugins to run
+  versionCheck: true
+
 # Rest Service
 #  tshock-only
 rest:
+
   # If the rest service is enabled, is ignored if not tshock
   enabled: false
 
@@ -158,11 +185,14 @@ rest:
   # How often in minutes the REST requests bucket is decreased by one, minimum value is 1 minute
   requestBucketDecreaseIntervalMinutes: 1
 
+  # Service settings
+  # Ref: https://kubernetes.io/docs/tutorials/kubernetes-basics/expose/expose-intro/
   service:
+
+    # The service type
     type: NodePort
 
-    # The port the rest api will be exposed as externally, if the service type is "NodePort", this
-    # will be the fixed port instead of a random one in the node port range
+    # The service port
     port: 7878
 
     # The port the rest api will be exposed as externally, if the service type is "NodePort", this
@@ -172,7 +202,11 @@ rest:
     # Load balancer IP, if service type is "LoadBalancer"
     loadBalancerIP: null
 
+    # External name, if service type is "ExternalName"
+    externalName: null
+
 image:
+
   # The pull policy that is used for all images, unless overridden for a specific image
   pullPolicy: IfNotPresent
 
