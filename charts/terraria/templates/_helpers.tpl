@@ -61,27 +61,6 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
-{{- define "terraria.worldsize" -}}
-{{- with .Values.world.size }}
-{{- if eq . "small" }}1
-{{- else if eq . "medium" }}2
-{{- else if eq . "large" }}3
-{{- else }}{{ fail (printf "world.size '%s' is invalid, must be one of: small, medium, large" .) }}
-{{- end }}
-{{- end }}
-{{- end }}
-
-{{- define "terraria.difficulty" -}}
-{{- with .Values.world.difficulty }}
-{{- if eq . "classic" }}0
-{{- else if eq . "expert" }}1
-{{- else if eq . "master" }}2
-{{- else if eq . "journey" }}3
-{{- else }}{{ fail (printf "world.difficulty '%s' is invalid, must be one of: classic, expert, master, journey" .) }}
-{{- end }}
-{{- end }}
-{{- end }}
-
 {{/*
 Tools image and pull policy.
 */}}
@@ -144,4 +123,45 @@ periodSeconds: {{ .periodSeconds }}
 timeoutSeconds: {{ .timeoutSeconds }}
 successThreshold: {{ .successThreshold }}
 failureThreshold: {{ .failureThreshold }}
+{{- end }}
+
+{{/*
+Defines the hex or rgb array color as an rgb list.
+*/}}
+{{- define "terraria.rgbColor" -}}
+{{- if kindIs "string" . }}
+  {{- if hasPrefix "#" . }}
+    {{- $hex := trimPrefix "#" . }}
+    {{- if ne (len $hex) 6 }}
+      {{- fail (printf "invalid hex color '%s', must be 7 characters long" .) }}
+    {{- end }}
+    {{- $red := include "terraria.hexToDecimal" (substr 0 2 $hex) }}
+    {{- $green := include "terraria.hexToDecimal" (substr 2 4 $hex) }}
+    {{- $blue := include "terraria.hexToDecimal" (substr 4 6 $hex) }}
+    {{- printf "[%s,%s,%s]" $red $green $blue }}
+  {{- else }}
+    {{- fail (printf "invalid color '%s'" .) }}
+  {{- end }}
+{{- else }}
+  {{- toJson . }}
+{{- end }}
+{{- end }}
+
+{{/*
+Converts a hex value to decimal.
+*/}}
+{{- define "terraria.hexToDecimal" -}}
+{{- $dict := dict "1" 1 "2" 2 "3" 3 "4" 4 "5" 5 "6" 6 "7" 7 "8" 8 "9" 9 "a" 10 "b" 11 "c" 12 "d" 13 "e" 14 "f" 15 }}
+{{- $value := 0 }}
+{{- $chars := reverse (regexSplit "" (lower .) -1) }}
+{{- $factor := 1 }}
+{{- range $char := $chars }}
+  {{- $decimal := index $dict $char }}
+  {{- if not $decimal }}
+    {{- fail (printf "invalid hex value '%s', contains invalid character '%s'" . $char) }}
+  {{- end }}
+  {{- $value = add $value (mul $decimal $factor) }}
+  {{- $factor = mul $factor 16 }}
+{{- end }}
+{{- $value }}
 {{- end }}

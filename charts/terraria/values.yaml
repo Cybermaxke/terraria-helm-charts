@@ -169,6 +169,54 @@ plugins:
   # Whether the API version should be checked, disabling this allows older plugins to run
   versionCheck: true
 
+# Chat
+#  tshock-only
+chat:
+
+  # Specifies which string starts a command. Note: Will not function properly if the string length
+  # is longer than one character.
+  commandSpecifier: "/"
+
+  # Specifies which string starts a command silently. Note: Will not function properly if the string
+  # length is longer than one character.
+  silentCommandSpecifier: "."
+
+  # Whether to announce a player's geographic location on join, based on their IP.
+  announceGeographicLocation: false
+
+  # Whether a player's IP should be displayed to users with the log permission.
+  displayPlayerIPOnJoin: false
+
+  # The color of the broadcast messages
+  broadcastColor: "#7fffd4"
+
+  # Chat format
+  #  placeholders:
+  #   - ${groupName}
+  #   - ${groupPrefix}
+  #   - ${playerName}
+  #   - ${groupSuffix}
+  #   - ${message}
+  format: "${groupPrefix}${playerName}${groupSuffix}: ${message}"
+
+  # Chat bubbles above players' heads
+  bubbles:
+
+    # If chat bubbles are enabled
+    enabled: true
+
+  # Super admin settings
+  superAdmin:
+
+    # The chat color for the super admin group. Color can be RGB as an array or HEX color value.
+    color: "#ffffff"
+
+    # The super admin prefix
+    prefix: "(Super Admin) "
+
+    # The super admin suffix
+    suffix: ""
+
 # Rest Service
 #  tshock-only
 rest:

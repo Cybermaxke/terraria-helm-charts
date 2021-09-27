@@ -12,8 +12,34 @@ data:
     priority=1
     world={{ tpl .Values.world.name . }}.wld
     worldname={{ tpl .Values.world.name . }}
-    autocreate={{ include "terraria.worldsize" . }}
-    difficulty={{ include "terraria.difficulty" . }}
+    {{- $worldsize := 0 }}
+    {{- with .Values.world.size }}
+    {{- if eq . "small" }}
+      {{- $worldsize = 1 }}
+    {{- else if eq . "medium" }}
+      {{- $worldsize = 2 }}
+    {{- else if eq . "large" }}
+      {{- $worldsize = 3 }}
+    {{- else }}
+      {{- fail (printf "world.size '%s' is invalid, must be one of: small, medium, large" .) }}
+    {{- end }}
+    {{- end }}
+    autocreate={{ $worldsize }}
+    {{- $difficuly := 0 }}
+    {{- with .Values.world.difficulty }}
+    {{- if eq . "classic" }}
+      {{- $difficuly = 0 }}
+    {{- else if eq . "expert" }}
+      {{- $difficuly = 1 }}
+    {{- else if eq . "master" }}
+      {{- $difficuly = 2 }}
+    {{- else if eq . "journey" }}
+      {{- $difficuly = 3 }}
+    {{- else }}
+      {{- fail (printf "world.difficulty '%s' is invalid, must be one of: classic, expert, master, journey" .) }}
+    {{- end }}
+    {{- end }}
+    difficulty={{ $difficuly }}
     {{- if include "terraria.tshock" . }}
     {{- /* tshock docs suggest to set max players in the terraria config 2 higher than the tshock config */}}
     maxplayers={{ add .Values.server.maxPlayers.base 2 }}
@@ -49,6 +75,24 @@ data:
         "AllowCrimsonCreep": {{ .Values.hardmode.spreadCrimson }},
         "AllowCorruptionCreep": {{ .Values.hardmode.spreadCorruption }},
         "AllowHallowCreep": {{ .Values.hardmode.spreadHallow }},
+        {{- /* Chat */}}
+        "CommandSpecifier": {{ .Values.chat.commandSpecifier }},
+        "SilentCommandSpecifier": {{ .Values.chat.silentCommandSpecifier }},
+        "SuperAdminChatRGB": {{ include "terraria.rgbColor" .Values.chat.superAdmin.color }},
+        "SuperAdminChatPrefix": "{{ .Values.chat.superAdmin.prefix }}",
+        "SuperAdminChatSuffix": "{{ .Values.chat.superAdmin.suffix }}",
+        "EnableGeoIP": {{ .Values.chat.announceGeographicLocation }},
+        "BroadcastRGB": {{ include "terraria.rgbColor" .Values.chat.broadcastColor }},
+        {{- $chatFormat := .Values.chat.format }}
+        {{- $chatFormat = replace "${groupName}" "{0}" $chatFormat }}
+        {{- $chatFormat = replace "${groupPrefix}" "{1}" $chatFormat }}
+        {{- $chatFormat = replace "${playerName}" "{2}" $chatFormat }}
+        {{- $chatFormat = replace "${groupSuffix}" "{3}" $chatFormat }}
+        {{- $chatFormat = replace "${message}" "{4}" $chatFormat }}
+        "ChatFormat": "{{ $chatFormat }}",
+        "DisplayIPToAdmins": {{ .Values.chat.displayPlayerIPOnJoin }},
+        "EnableChatAboveHeads": {{ .Values.chat.bubbles.enabled }},
+        {{- /* Rest API */}}
         "RestApiEnabled": {{ .Values.rest.enabled }},
         "RestApiPort": 7878,
         "LogRest": {{ .Values.rest.loggingEnabled }},
