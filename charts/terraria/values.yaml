@@ -292,6 +292,7 @@ resources: {}
   #   cpu: 100m
   #   memory: 512Mi
 
+# Startup probe configuration
 startupProbe:
   initialDelaySeconds: 10
   periodSeconds: 10
@@ -299,6 +300,7 @@ startupProbe:
   failureThreshold: 6
   successThreshold: 1
 
+# Liveness probe configuration
 livenessProbe:
   initialDelaySeconds: 10
   periodSeconds: 10
@@ -306,6 +308,7 @@ livenessProbe:
   failureThreshold: 1
   successThreshold: 1
 
+# Readiness probe configuration
 readinessProbe:
   initialDelaySeconds: 10
   periodSeconds: 10

@@ -14,4 +14,4 @@ with a few improvements.
 
 ## Notes
 
-The helm charts expect images with these modifications and will not work properly otherwise. 
+The helm charts expect images with these modifications and will not work properly otherwise.

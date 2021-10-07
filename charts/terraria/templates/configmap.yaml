@@ -21,25 +21,25 @@ data:
     {{- else if eq . "large" }}
       {{- $worldsize = 3 }}
     {{- else }}
-      {{- fail (printf "world.size '%s' is invalid, must be one of: small, medium, large" .) }}
+      {{- fail (printf "world.size '%s' is invalid, must be one of: small, medium, large" $worldsize) }}
     {{- end }}
     {{- end }}
     autocreate={{ $worldsize }}
-    {{- $difficuly := 0 }}
+    {{- $difficulty := 0 }}
     {{- with .Values.world.difficulty }}
     {{- if eq . "classic" }}
-      {{- $difficuly = 0 }}
+      {{- $difficulty = 0 }}
     {{- else if eq . "expert" }}
-      {{- $difficuly = 1 }}
+      {{- $difficulty = 1 }}
     {{- else if eq . "master" }}
-      {{- $difficuly = 2 }}
+      {{- $difficulty = 2 }}
     {{- else if eq . "journey" }}
-      {{- $difficuly = 3 }}
+      {{- $difficulty = 3 }}
     {{- else }}
-      {{- fail (printf "world.difficulty '%s' is invalid, must be one of: classic, expert, master, journey" .) }}
+      {{- fail (printf "world.difficulty '%s' is invalid, must be one of: classic, expert, master, journey" $difficulty) }}
     {{- end }}
     {{- end }}
-    difficulty={{ $difficuly }}
+    difficulty={{ $difficulty }}
     {{- if include "terraria.tshock" . }}
     {{- /* tshock docs suggest to set max players in the terraria config 2 higher than the tshock config */}}
     maxplayers={{ add .Values.server.maxPlayers.base 2 }}
@@ -56,6 +56,7 @@ data:
     {{- end }}
     slowliquids={{ int .Values.world.slowLiquids }}
     secure={{ int .Values.antiCheatProtection.enabled }}
+  {{- if include "terraria.tshock" . }}
   config.json: |
     {
       "Settings": {
@@ -76,8 +77,8 @@ data:
         "AllowCorruptionCreep": {{ .Values.hardmode.spreadCorruption }},
         "AllowHallowCreep": {{ .Values.hardmode.spreadHallow }},
         {{- /* Chat */}}
-        "CommandSpecifier": {{ .Values.chat.commandSpecifier }},
-        "SilentCommandSpecifier": {{ .Values.chat.silentCommandSpecifier }},
+        "CommandSpecifier": "{{ .Values.chat.commandSpecifier }}",
+        "SilentCommandSpecifier": "{{ .Values.chat.silentCommandSpecifier }}",
         "SuperAdminChatRGB": {{ include "terraria.rgbColor" .Values.chat.superAdmin.color }},
         "SuperAdminChatPrefix": "{{ .Values.chat.superAdmin.prefix }}",
         "SuperAdminChatSuffix": "{{ .Values.chat.superAdmin.suffix }}",
@@ -102,3 +103,4 @@ data:
         "ApplicationRestTokens": {}
       }
     }
+  {{- end }}
