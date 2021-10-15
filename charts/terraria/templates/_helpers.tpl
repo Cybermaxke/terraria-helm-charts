@@ -83,12 +83,21 @@ Sends a "connection request" packet with "Liveness" as version (base64 encoded s
 should respond with "Multiplayer.4" which is a version mismatch disconnect message.
 */}}
 {{- define "terraria.livenessCheck" -}}
+{{- /*
+The on last player exit feature interferes with the packet, which causes a save for every
+packet. So just use a tcp probe if it is enabled.
+*/ -}}
+{{- if and (include "terraria.tshock" .) .Values.world.saveOnLastPlayerExit -}}
+tcpSocket:
+  port: 7777
+{{- else -}}
 exec:
   command:
     - bash
     - -c
     - "{{ include "terraria.livenessPacket" . }} | (exec 3<>/dev/tcp/localhost/7777; cat >&3; cat <&3; exec 3<&-) | grep 'Multiplayer.4'"
-{{- end }}
+{{- end -}}
+{{- end -}}
 
 {{/*
 Returns if the deployed image is tshock.
@@ -164,4 +173,59 @@ Converts a hex value to decimal.
   {{- $factor = mul $factor 16 }}
 {{- end }}
 {{- $value }}
+{{- end }}
+
+{{/*
+Defines rest application tokens.
+*/}}
+{{- define "terraria.restApplicationTokens" -}}
+{{- $entries := list -}}
+{{- range .Values.rest.applicationTokens -}}
+  {{ $entries = append $entries (include "terraria.restApplicationToken" .) -}}
+{{- end -}}
+{{- join ",\n" $entries }}
+{{- end }}
+
+{{/*
+Defines a rest application token.
+*/}}
+{{- define "terraria.restApplicationToken" -}}
+"{{ .name }}": {
+  "Username": "{{ .user }}",
+  "UserGroupName": "{{ .userGroup }}"
+}
+{{- end }}
+
+{{/*
+Converts the duration to minutes.
+*/}}
+{{- define "terraria.durationToMinutes" -}}
+{{- $seconds := include "terraria.durationToSecondsFloat" . | float64 }}
+{{- round (divf $seconds 60) 0 }}
+{{- end }}
+
+{{/*
+Converts the duration to seconds.
+*/}}
+{{- define "terraria.durationToSeconds" -}}
+{{- $seconds := include "terraria.durationToSecondsFloat" . | float64 }}
+{{- round $seconds 0 }}
+{{- end }}
+
+{{/*
+Converts the duration to seconds and floating-point precision.
+*/}}
+{{- define "terraria.durationToSecondsFloat" -}}
+{{- if or (not .) (not (regexMatch "^([0-9.]+d)?([0-9.]+h)?([0-9.]+m)?([0-9.]+s)?$" .)) }}
+  {{- fail (printf "Invalid duration: %s" .) }}
+{{- end }}
+{{- $seconds := regexFind "[0-9.]+s" . | trimSuffix "s" | float64 }}
+{{- $minutes := regexFind "[0-9.]+m" . | trimSuffix "m" | float64 }}
+{{- $hours   := regexFind "[0-9.]+h" . | trimSuffix "h" | float64 }}
+{{- $days    := regexFind "[0-9.]+d" . | trimSuffix "d" | float64 }}
+{{- $totalSeconds := $seconds }}
+{{- $totalSeconds := addf $totalSeconds (mulf $minutes 60) }}
+{{- $totalSeconds := addf $totalSeconds (mulf $hours 3600) }}
+{{- $totalSeconds := addf $totalSeconds (mulf $days 86400) }}
+{{- $totalSeconds }}
 {{- end }}

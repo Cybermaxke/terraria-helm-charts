@@ -18,5 +18,15 @@ world:
   persistentVolume:
     enabled: false
 
+rest:
+  enabled: true
+  applicationTokens:
+    - name: rest-ban-token
+      user: rest-banner
+      userGroup: rest-ban-group
+    - name: rest-restart-token
+      user: rest-restarter
+      userGroup: rest-restart-group
+
 # image:
 #   tag: vanilla-latest

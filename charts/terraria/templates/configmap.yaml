@@ -76,6 +76,14 @@ data:
         "AllowCrimsonCreep": {{ .Values.hardmode.spreadCrimson }},
         "AllowCorruptionCreep": {{ .Values.hardmode.spreadCorruption }},
         "AllowHallowCreep": {{ .Values.hardmode.spreadHallow }},
+        {{- /* Backup and Save */}}
+        "AutoSave": {{ .Values.world.autoSave }},
+        "AnnounceSave": {{ .Values.world.announceSave }},
+        "ShowBackupAutosaveMessages": {{ .Values.world.backup.announceSave }},
+        "BackupInterval": {{ include "terraria.durationToMinutes" .Values.world.backup.interval }},
+        "BackupKeepFor": {{ include "terraria.durationToMinutes" .Values.world.backup.keepFor }},
+        "SaveWorldOnCrash": {{ .Values.world.saveOnCrash }},
+        "SaveWorldOnLastPlayerExit": {{ .Values.world.saveOnLastPlayerExit }},
         {{- /* Chat */}}
         "CommandSpecifier": "{{ .Values.chat.commandSpecifier }}",
         "SilentCommandSpecifier": "{{ .Values.chat.silentCommandSpecifier }}",
@@ -100,7 +108,9 @@ data:
         "EnableTokenEndpointAuthentication": false,
         "RESTMaximumRequestsPerInterval": {{ .Values.rest.maxRequestsPerInterval }},
         "RESTRequestBucketDecreaseIntervalMinutes": {{ .Values.rest.requestBucketDecreaseIntervalMinutes }},
-        "ApplicationRestTokens": {}
+        "ApplicationRestTokens": {
+          {{- include "terraria.restApplicationTokens" . | nindent 10 }}
+        }
       }
     }
   {{- end }}

@@ -125,15 +125,44 @@ world:
   # World difficulty: classic, expert, master or journey
   difficulty: classic
 
-  # Rollbacks to keep
-  rollbacksToKeep: 2
-
   # Seed used to generate the world, null to use a random seed
   seed: null
 
   # Reduces maximum liquids moving at the same time. If enabled may reduce lags but liquids may
   # take longer to settle
   slowLiquids: false
+
+  # If auto save is enabled
+  #  tshock-only, cannot be disabled for the vanilla image
+  autoSave: true
+
+  # If saving should be announced
+  #  tshock-only
+  announceSave: true
+
+  # Whether to save the world if the server crashes from an unhandled exception
+  #  tshock-only
+  saveOnCrash: true
+
+  # Whether to save the world when the last player disconnects
+  #  tshock-only
+  saveOnLastPlayerExit: true
+
+  # World backup, backups are stored next to the world file under a backup directory
+  #  tshock-only
+  backup:
+
+    # If saving caused by backing up should be announced
+    announceSave: true
+
+    # Backup interval, setting the interval to zero disables backups
+    interval: 0m
+
+    # How long backups should be kept
+    keepFor: 1h
+
+  # Rollbacks to keep
+  rollbacksToKeep: 2
 
   # Persistent volume where the worlds are stored
   persistentVolume:
@@ -232,6 +261,13 @@ rest:
 
   # How often in minutes the REST requests bucket is decreased by one, minimum value is 1 minute
   requestBucketDecreaseIntervalMinutes: 1
+
+  # Access tokens that are persistent between restarts
+  # Ref: https://tshock.readme.io/reference/rest-api-endpoints
+  applicationTokens:
+    # - name: rest-ban-token
+    #   user: rest-banner
+    #   userGroup: rest-ban-groupo
 
   # Service settings
   # Ref: https://kubernetes.io/docs/tutorials/kubernetes-basics/expose/expose-intro/
