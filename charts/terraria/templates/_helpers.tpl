@@ -160,14 +160,15 @@ Defines the hex or rgb array color as an rgb list.
 Converts a hex value to decimal.
 */}}
 {{- define "terraria.hexToDecimal" -}}
-{{- $dict := dict "1" 1 "2" 2 "3" 3 "4" 4 "5" 5 "6" 6 "7" 7 "8" 8 "9" 9 "a" 10 "b" 11 "c" 12 "d" 13 "e" 14 "f" 15 }}
+{{- $hex := . }}
+{{- $dict := dict "0" 0 "1" 1 "2" 2 "3" 3 "4" 4 "5" 5 "6" 6 "7" 7 "8" 8 "9" 9 "a" 10 "b" 11 "c" 12 "d" 13 "e" 14 "f" 15 }}
 {{- $value := 0 }}
-{{- $chars := reverse (regexSplit "" (lower .) -1) }}
+{{- $chars := reverse (regexSplit "" (lower $hex) -1) }}
 {{- $factor := 1 }}
 {{- range $char := $chars }}
   {{- $decimal := index $dict $char }}
-  {{- if not $decimal }}
-    {{- fail (printf "invalid hex value '%s', contains invalid character '%s'" . $char) }}
+  {{- if and (not (eq $char "0")) (not $decimal) }}
+    {{- fail (printf "invalid hex value '%s', contains invalid character '%s'" $hex $char) }}
   {{- end }}
   {{- $value = add $value (mul $decimal $factor) }}
   {{- $factor = mul $factor 16 }}
