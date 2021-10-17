@@ -55,9 +55,9 @@ Create the name of the service account to use
 */}}
 {{- define "terraria.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "terraria.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "terraria.fullname" .) (tpl .Values.serviceAccount.name .) }}
 {{- else }}
-{{- default "default" .Values.serviceAccount.name }}
+{{- default "default" (tpl .Values.serviceAccount.name .) }}
 {{- end }}
 {{- end }}
 
@@ -84,7 +84,7 @@ should respond with "Multiplayer.4" which is a version mismatch disconnect messa
 */}}
 {{- define "terraria.livenessCheck" -}}
 {{- /*
-The on last player exit feature interferes with the packet, which causes a save for every
+The save on last player exit feature interferes with the packet, which causes a save for every
 packet. So just use a tcp probe if it is enabled.
 */ -}}
 {{- if and (include "terraria.tshock" .) .Values.world.saveOnLastPlayerExit -}}

@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "terre.fullname" . }}
+  {{- include "terre.namespace" . | nindent 2 }}
+  labels:
+    {{- include "terre.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "terre.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "terre.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "terre.serviceAccountName" . }}
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      volumes:
+        - name: logs
+          emptyDir: {}
+        - name: plugins
+          emptyDir: {}
+        - name: config
+          emptyDir: {}
+        - name: proxy-config
+          configMap:
+            name: {{ include "terre.fullname" . }}
+        {{- if .Values.servers.autoDiscovery.enabled }}
+        - name: server-finder-config
+          configMap:
+            name: {{ include "terre.fullname" . }}-server-finder
+        {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+          image: "{{ tpl .Values.image.terre.repository . }}:{{ tpl .Values.image.terre.tag . }}"
+          imagePullPolicy: {{ default .Values.image.pullPolicy .Values.image.terre.pullPolicy }}
+          volumeMounts:
+            - name: logs
+              mountPath: /logs
+            - name: plugins
+              mountPath: /plugins
+            - name: config
+              mountPath: /config
+            - name: proxy-config
+              mountPath: /config/config.yaml
+              subPath: config.yaml
+            {{- if .Values.servers.autoDiscovery.enabled }}
+            - name: server-finder-config
+              mountPath: /config/k8s-server-finder/config.yaml
+              subPath: config.yaml
+            {{- end }}
+          ports:
+            - name: proxy
+              containerPort: 7777
+          startupProbe:
+            tcpSocket:
+              port: 7777
+            {{- include "terre.probeValues" .Values.startupProbe | nindent 12 }}
+          livenessProbe:
+            tcpSocket:
+              port: 7777
+            {{- include "terre.probeValues" .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            tcpSocket:
+              port: 7777
+            {{- include "terre.probeValues" .Values.readinessProbe | nindent 12 }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -5,6 +5,14 @@ metadata:
   {{- include "terraria.namespace" . | nindent 2 }}
   labels:
     {{- include "terraria.labels" . | nindent 4 }}
+    {{- if .Values.terre.autoDiscovery.enabled }}
+    {{- /* Terre will use the following labels to register the service as a server */}}
+    "{{ .Values.terre.autoDiscovery.selectorLabel.name }}": "{{ .Values.terre.autoDiscovery.selectorLabel.value }}"
+    terraria-server-port: "7777"
+    terraria-server-name: "{{ tpl .Values.server.name . }}"
+    terraria-server-password: "{{ .Values.server.password }}"
+    terraria-server-allow-auto-join: "{{ .Values.terre.autoDiscovery.allowAutoJoin }}"
+    {{- end }}
 spec:
   type: {{ .Values.server.service.type }}
   {{- with .Values.server.service.loadBalancerIP }}

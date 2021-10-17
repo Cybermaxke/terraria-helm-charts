@@ -1,0 +1,135 @@
+# Default values for Terre
+
+# Name override
+nameOverride: ""
+
+# Full name override
+fullnameOverride: ""
+
+# Service account
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# Configuration of the proxy
+proxy:
+
+  # The name of the proxy
+  name: "{{ .Release.Name }}"
+
+  # The password to connect to the proxy, if any
+  password: ""
+
+  # The maximum number of players that are allowed to join, if set to -1, the limit depends on the
+  # available slots of the backing servers
+  maxPlayers: -1
+
+  # Service settings
+  # Ref: https://kubernetes.io/docs/tutorials/kubernetes-basics/expose/expose-intro/
+  service:
+
+    # The service type
+    type: NodePort
+
+    # The service port
+    port: 7777
+
+    # The port the proxy will be exposed as externally, if the service type is "NodePort", this
+    # will be the fixed port instead of a random one in the node port range
+    nodePort: null
+
+    # Load balancer IP, if service type is "LoadBalancer"
+    loadBalancerIP: null
+
+    # External name, if service type is "ExternalName"
+    externalName: null
+
+# Configuration for servers that will be proxied
+servers:
+
+  # Automatically discover servers
+  autoDiscovery:
+
+    # If automatically detecting servers is enabled
+    enabled: true
+
+    # The namespace where to look for servers, defaults to the namespace where terre is deployed
+    # Setting to "" will scan all the namespaces
+    namespace: "{{ .Release.Namespace }}"
+
+    # The label selector that will be used to discover servers
+    labelSelector: "terraria-server=true"
+
+    # Specifies whether a role should be created and bound to allow the services to be read by the
+    # service account
+    createServiceReaderRole: true
+
+  # Servers that are configured manually
+  fixed: []
+    # - name: server-name
+    #   host: localhost
+    #   port: 7777
+    #   password: ""
+    #   allowAutoJoin: true
+
+image:
+
+  # The pull policy that is used for all images, unless overridden for a specific image
+  pullPolicy: IfNotPresent
+
+  # The pull secrets
+  pullSecrets: []
+
+  # The terre image
+  terre:
+    repository: cybermaxke/terre
+    tag: "{{ .Chart.AppVersion }}"
+    # The pull policy, image.pullPolicy is used if not set
+    pullPolicy: null
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# Startup probe configuration
+startupProbe:
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 2
+  successThreshold: 1
+
+# Liveness probe configuration
+livenessProbe:
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 1
+  successThreshold: 1
+
+# Readiness probe configuration
+readinessProbe:
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 1
+  failureThreshold: 1
+  successThreshold: 1
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

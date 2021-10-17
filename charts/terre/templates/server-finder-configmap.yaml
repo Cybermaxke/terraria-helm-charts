@@ -1,0 +1,14 @@
+{{- if .Values.servers.autoDiscovery.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "terre.fullname" . }}-server-finder
+  {{- include "terre.namespace" . | nindent 2 }}
+  labels:
+    {{- include "terre.labels" . | nindent 4 }}
+data:
+  config.yaml: |
+    serverFinder:
+      namespace: "{{ tpl .Values.servers.autoDiscovery.namespace . }}"
+      labelSelector: "{{ .Values.servers.autoDiscovery.labelSelector }}"
+{{- end }}

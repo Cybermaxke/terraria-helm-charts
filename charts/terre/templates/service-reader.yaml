@@ -1,0 +1,43 @@
+{{- if .Values.servers.autoDiscovery.createServiceReaderRole }}
+apiVersion: rbac.authorization.k8s.io/v1
+{{- $namespace := tpl .Values.servers.autoDiscovery.namespace . }}
+{{- $roleKind := "ClusterRole" }}
+{{- if $namespace }}
+  {{- $roleKind = "Role" }}
+{{- end }}
+kind: {{ $roleKind }}
+metadata:
+  name: {{ include "terre.fullname" . }}-service-reader
+  {{- if $namespace }}
+  namespace: {{ $namespace }}
+  {{- else }}
+  {{- include "terre.namespace" . | nindent 2 }}
+  {{- end }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - get
+      - watch
+      - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: {{ printf "%sBinding" $roleKind }}
+metadata:
+  name: {{ include "terre.fullname" . }}-read-services
+  {{- if $namespace }}
+  namespace: {{ $namespace }}
+  {{- else }}
+  {{- include "terre.namespace" . | nindent 2 }}
+  {{- end }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "terre.serviceAccountName" . }}
+    {{- include "terre.namespace" . | nindent 4 }}
+roleRef:
+  kind: {{ $roleKind }}
+  name: {{ include "terre.fullname" . }}-service-reader
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}

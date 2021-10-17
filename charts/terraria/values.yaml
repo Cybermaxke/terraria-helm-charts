@@ -1,5 +1,12 @@
-# Default values for Terraria.
+# Default values for Terraria
 
+# Name override
+nameOverride: ""
+
+# Full name override
+fullnameOverride: ""
+
+# Server
 server:
 
   # Service settings
@@ -7,7 +14,7 @@ server:
   service:
 
     # The service type
-    type: NodePort
+    type: ClusterIP
 
     # The service port
     port: 7777
@@ -274,7 +281,7 @@ rest:
   service:
 
     # The service type
-    type: NodePort
+    type: ClusterIP
 
     # The service port
     port: 7878
@@ -312,6 +319,24 @@ image:
     tag: alpine-3.14.2
     # The pull policy, image.pullPolicy is used if not set
     pullPolicy: null
+
+# Configuration when used in combination with terre
+terre:
+
+  # Configuration related to terre auto discovery
+  autoDiscovery:
+
+    # If auto discovery is enabled
+    enabled: true
+
+    # Allows players to automatically join this server when they connect to the terre, without
+    # having to explicitly teleport
+    allowAutoJoin: true
+
+    # The label that terre will use to automatically detect the terraria server
+    selectorLabel:
+      name: terraria-server
+      value: true
 
 # Extra init containers that are added to the deployment
 extraInitContainers: {}
