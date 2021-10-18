@@ -24,6 +24,8 @@ spec:
         runAsGroup: 1000
         fsGroup: 1000
       volumes:
+        - name: tmp
+          emptyDir: {}
         - name: logs
           emptyDir: {}
         - name: plugins
@@ -43,10 +45,12 @@ spec:
           securityContext:
             runAsNonRoot: true
             allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: false
+            readOnlyRootFilesystem: true
           image: "{{ tpl .Values.image.terre.repository . }}:{{ tpl .Values.image.terre.tag . }}"
           imagePullPolicy: {{ default .Values.image.pullPolicy .Values.image.terre.pullPolicy }}
           volumeMounts:
+            - name: tmp
+              mountPath: /tmp
             - name: logs
               mountPath: /logs
             - name: plugins
