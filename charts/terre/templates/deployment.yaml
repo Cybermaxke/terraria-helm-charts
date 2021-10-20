@@ -20,9 +20,9 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "terre.serviceAccountName" . }}
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
       volumes:
         - name: tmp
           emptyDir: {}
