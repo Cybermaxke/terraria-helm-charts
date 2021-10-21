@@ -10,9 +10,6 @@ spec:
   {{- with .Values.proxy.service.loadBalancerIP }}
   loadBalancerIP: {{ . }}
   {{- end }}
-  {{- with .Values.proxy.service.externalName }}
-  externalName: {{ . }}
-  {{- end }}
   ports:
     - port: {{ .Values.proxy.service.port }}
       targetPort: proxy

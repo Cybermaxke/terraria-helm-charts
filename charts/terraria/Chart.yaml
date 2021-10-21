@@ -2,6 +2,6 @@ apiVersion: v2
 name: terraria
 description: A Helm chart for Terraria
 type: application
-version: 0.1.7
+version: 0.1.8
 appVersion: "1.4.2.3"
 icon: https://terraria.org/static/media/logo.734118ae.png

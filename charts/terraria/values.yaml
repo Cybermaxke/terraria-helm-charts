@@ -26,9 +26,6 @@ server:
     # Load balancer IP, if service type is "LoadBalancer"
     loadBalancerIP: null
 
-    # External name, if service type is "ExternalName"
-    externalName: null
-
   # The name of the server
   name: "{{ .Release.Name }}"
 
@@ -292,9 +289,6 @@ rest:
 
     # Load balancer IP, if service type is "LoadBalancer"
     loadBalancerIP: null
-
-    # External name, if service type is "ExternalName"
-    externalName: null
 
 image:
 

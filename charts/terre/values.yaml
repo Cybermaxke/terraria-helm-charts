@@ -46,9 +46,6 @@ proxy:
     # Load balancer IP, if service type is "LoadBalancer"
     loadBalancerIP: null
 
-    # External name, if service type is "ExternalName"
-    externalName: null
-
 # Configuration for servers that will be proxied
 servers:
 

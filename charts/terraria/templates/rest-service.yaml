@@ -11,9 +11,6 @@ spec:
   {{- with .Values.rest.service.loadBalancerIP }}
   loadBalancerIP: {{ . }}
   {{- end }}
-  {{- with .Values.server.service.externalName }}
-  externalName: {{ . }}
-  {{- end }}
   ports:
     - port: {{ .Values.rest.service.port }}
       targetPort: rest
