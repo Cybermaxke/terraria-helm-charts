@@ -8,11 +8,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: {{ $roleKind }}
 metadata:
   name: {{ include "terre.fullname" . }}-service-reader
-  {{- if $namespace }}
-  namespace: {{ $namespace }}
-  {{- else }}
-  {{- include "terre.namespace" . | nindent 2 }}
-  {{- end }}
+  namespace: {{ $namespace | default (include "terre.namespace" .) }}
 rules:
   - apiGroups:
       - ""
@@ -27,15 +23,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: {{ printf "%sBinding" $roleKind }}
 metadata:
   name: {{ include "terre.fullname" . }}-read-services
-  {{- if $namespace }}
-  namespace: {{ $namespace }}
-  {{- else }}
-  {{- include "terre.namespace" . | nindent 2 }}
-  {{- end }}
+  namespace: {{ $namespace | default (include "terre.namespace" .) }}
 subjects:
   - kind: ServiceAccount
     name: {{ include "terre.serviceAccountName" . }}
-    {{- include "terre.namespace" . | nindent 4 }}
+    namespace: {{ include "terre.namespace" . }}
 roleRef:
   kind: {{ $roleKind }}
   name: {{ include "terre.fullname" . }}-service-reader

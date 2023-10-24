@@ -6,6 +6,9 @@ nameOverride: ""
 # Full name override
 fullnameOverride: ""
 
+# The timezone
+timezone: Etc/UTC
+
 # Server
 server:
 
@@ -170,6 +173,7 @@ world:
 
   # Persistent volume where the worlds are stored
   persistentVolume:
+
     # If a persistent volume should be used to store worlds, otherwise uses emptyDir
     enabled: true
 
@@ -192,6 +196,7 @@ world:
 
   # Worlds empty dir
   emptyDir:
+
     # Volume size limit
     sizeLimit: null
 
@@ -300,10 +305,16 @@ image:
 
   # The terraria server image
   terraria:
+
     # The image type: tshock, vanilla, null to derive from image tag
     type: null
-    repository: cybermaxke/terraria
-    tag: tshock-{{ .Chart.AppVersion }}
+
+    # The repository where the images are located
+    repository: ghcr.io/cybermaxke/terraria
+
+    # The image (Terraria/tShock version) to deploy
+    tag: tshock-1.4.4.9
+
     # The pull policy, image.pullPolicy is used if not set
     pullPolicy: null
 
@@ -380,15 +391,19 @@ tolerations: []
 affinity: {}
 
 rbac:
+
   # Specifies whether RBAC resources should be created
   create: true
 
 # Service account
 serviceAccount:
+
   # Specifies whether a service account should be created
   create: true
+
   # Annotations to add to the service account
   annotations: {}
+
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""

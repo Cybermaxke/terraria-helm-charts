@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "terre.fullname" . }}
-  {{- include "terre.namespace" . | nindent 2 }}
+  namespace: {{ include "terre.namespace" . }}
   labels:
     {{- include "terre.labels" . | nindent 4 }}
 spec:
@@ -48,6 +48,9 @@ spec:
             readOnlyRootFilesystem: true
           image: "{{ tpl .Values.image.terre.repository . }}:{{ tpl .Values.image.terre.tag . }}"
           imagePullPolicy: {{ default .Values.image.pullPolicy .Values.image.terre.pullPolicy }}
+          env:
+            - name: TZ
+              value: {{ .Values.timezone }}
           volumeMounts:
             - name: tmp
               mountPath: /tmp

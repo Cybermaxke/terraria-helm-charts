@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "terre.fullname" . }}-server-finder
-  {{- include "terre.namespace" . | nindent 2 }}
+  namespace: {{ include "terre.namespace" . }}
   labels:
     {{- include "terre.labels" . | nindent 4 }}
 data:

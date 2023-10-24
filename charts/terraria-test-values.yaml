@@ -4,7 +4,7 @@ server:
 
 extraInitContainers:
   download-plugins:
-    image: cybermaxke/tools:alpine-3.14.2
+    image: ghcr.io/cybermaxke/tools:latest
     imagePullPolicy: IfNotPresent
     command:
       - sh

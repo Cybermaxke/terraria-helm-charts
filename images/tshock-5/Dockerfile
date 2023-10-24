@@ -21,23 +21,35 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-FROM alpine:3.14.2 AS base
+FROM alpine:latest AS base
 
 RUN apk add --update-cache unzip
 
-ENV TSHOCK_VERSION=v4.5.5
-ENV TSHOCK_ZIP=TShock4.5.5_Terraria_1.4.2.3.zip
+ARG TERRARIA_VERSION=1.4.4.9
+ARG TSHOCK_VERSION=5.2
 
-# Download and unpack TShock
-ADD https://github.com/Pryaxis/TShock/releases/download/$TSHOCK_VERSION/$TSHOCK_ZIP /
-RUN unzip $TSHOCK_ZIP -d /tshock && \    
-  rm $TSHOCK_ZIP && \
-  chmod +x /tshock/TerrariaServer.exe
+RUN set -eux; \
+  ARCH="$(apk --print-arch)"; \
+  case "$ARCH" in \
+    'x86_64') ARCH=x64 ;; \
+    'aarch64') ARCH=arm64 ;; \
+    *) echo >&2 "error: unsupported architecture '$ARCH'."; exit 1 ;; \
+  esac; \
+  RELEASES="https://github.com/Pryaxis/TShock/releases/download"; \
+  (wget "$RELEASES/v${TSHOCK_VERSION}/TShock-$TSHOCK_VERSION-for-Terraria-$TERRARIA_VERSION-linux-$ARCH-Release.zip" -O /tshock.zip || \
+   wget "$RELEASES/v${TSHOCK_VERSION}.0/TShock-$TSHOCK_VERSION-for-Terraria-$TERRARIA_VERSION-linux-$ARCH-Release.zip" -O /tshock.zip || \
+   wget "$RELEASES/v${TSHOCK_VERSION}/TShock-$(echo $TSHOCK_VERSION | sed -e 's/\.0$//')-for-Terraria-$TERRARIA_VERSION-linux-$ARCH-Release.zip" -O /tshock.zip); \
+  unzip /tshock.zip -d /tshock; \
+  rm /tshock.zip; \
+  tar -xvf /tshock/*.tar -C /tshock; \
+  rm /tshock/*.tar
 
-# Cannot be the slim version, plugins may have dependencies
-FROM mono:6.12.0.107
+FROM mcr.microsoft.com/dotnet/runtime:6.0
 
-LABEL maintainer="Seppe Volkaerts <contact@seppevolkaerts.be>"
+LABEL org.opencontainers.image.authors="Seppe Volkaerts <contact@seppevolkaerts.be>"
+LABEL org.opencontainers.image.url="https://github.com/Cybermaxke/terraria-helm-charts"
+LABEL org.opencontainers.image.documentation="tShock $TSHOCK_VERSION for Terraria $TERRARIA_VERSION"
+LABEL org.opencontainers.image.source="https://github.com/Cybermaxke/terraria-helm-charts/blob/master/images/tshock/Dockerfile"
 
 # Server port
 EXPOSE 7777
@@ -48,20 +60,23 @@ EXPOSE 7878
 COPY --from=base /tshock /tshock
 COPY bootstrap.sh /tshock
 
-RUN groupadd terraria -g 1000 && \
-  useradd terraria -m -u 1000 -g 1000 && \
+ARG TERRARIA_GID=1000
+ARG TERRARIA_UID=1000
+
+RUN groupadd terraria -g $TERRARIA_GID && \
+  useradd terraria -m -u $TERRARIA_UID -g $TERRARIA_GID && \
   apt-get update -y && \
   # Install nuget to grab TShock dependencies
   apt-get install -y nuget pcregrep && \
-  rm -rf /var/lib/apt/lists* /tmp* && \
-  # The bootstrap script needs to be able to copy plugins to the ServerPlugins directory
-  chown terraria:terraria /tshock/ServerPlugins && \
+  rm -rf /var/lib/apt/lists* /tmp/* && \
   mkdir /tshock/tmp && \
-  chown terraria:terraria /tshock/tmp
+  chmod +x /tshock/TShock.Server && \
+  chmod +x /tshock/bootstrap.sh
 
 WORKDIR /home/terraria/server
 
-RUN chown -R terraria:terraria .
+RUN chown -R terraria:terraria . && \
+    chown -R terraria:terraria /tshock
 
 USER terraria
 

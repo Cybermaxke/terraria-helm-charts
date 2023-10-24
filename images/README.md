@@ -15,3 +15,11 @@ with a few improvements.
 ## Notes
 
 The helm charts expect images with these modifications and will not work properly otherwise.
+
+## Examples
+```
+docker build images/tshock-4 --tag ghcr.io/cybermaxke/terraria:tshock-1.4.3.6  --build-arg TERRARIA_VERSION=1.4.3.6 --build-arg TSHOCK_VERSION=4.5.18
+docker build images/tshock-5 --tag ghcr.io/cybermaxke/terraria:tshock-1.4.4.9  --build-arg TERRARIA_VERSION=1.4.4.9 --build-arg TSHOCK_VERSION=5.2.0
+docker build images/vanilla  --tag ghcr.io/cybermaxke/terraria:vanilla-1.4.4.9 --build-arg TERRARIA_VERSION=1.4.4.9
+docker build images/tools    --tag ghcr.io/cybermaxke/tools:latest
+```

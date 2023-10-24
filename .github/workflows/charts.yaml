@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - charts/**
 
 jobs:
   release:
@@ -26,5 +28,7 @@ jobs:
           helm repo add terraria https://cybermaxke.github.io/terraria-helm-charts
       - name: Release Charts
         uses: helm/chart-releaser-action@v1.2.1
+        with:
+          skip_existing: true
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"

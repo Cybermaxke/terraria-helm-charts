@@ -67,15 +67,15 @@ Tools image and pull policy.
 {{- define "terraria.toolsImage" -}}
 image: {{ tpl .Values.image.tools.repository . }}:{{ tpl .Values.image.tools.tag . }}
 imagePullPolicy: {{ default .Values.image.pullPolicy .Values.image.terraria.pullPolicy }}
-{{- end }}
+{{- end -}}
 
 {{- define "terraria.livenessPacket" -}}
 echo 'DAABCExpdmVuZXNz' | base64 -d
-{{- end }}
+{{- end -}}
 
 {{- define "terraria.socatLivenessCommand" -}}
 {{ include "terraria.livenessPacket" . }} | socat - tcp-connect:{{ include "terraria.fullname" . }}:7777 | grep 'Multiplayer.4'
-{{- end }}
+{{- end -}}
 
 {{/*
 Checks if the terraria server is accepting connections.
@@ -83,20 +83,20 @@ Sends a "connection request" packet with "Liveness" as version (base64 encoded s
 should respond with "Multiplayer.4" which is a version mismatch disconnect message.
 */}}
 {{- define "terraria.livenessCheck" -}}
-{{- /*
-The save on last player exit feature interferes with the packet, which causes a save for every
-packet. So just use a tcp probe if it is enabled.
-*/ -}}
-{{- if and (include "terraria.tshock" .) .Values.world.saveOnLastPlayerExit -}}
-tcpSocket:
-  port: 7777
-{{- else -}}
 exec:
   command:
     - bash
     - -c
+    {{- /*
+    The save on last player exit feature interferes with the packet, which causes a save for every
+    packet. So only check if the tcp port is available in that case. We are not using the tcpSocket
+    health probe directly so we can send requests from localhost which gets filtered out in the logs.
+    */ -}}
+    {{- if and (include "terraria.tshock" .) .Values.world.saveOnLastPlayerExit }}
+    - "echo >/dev/tcp/localhost/7777"
+    {{- else }}
     - "{{ include "terraria.livenessPacket" . }} | (exec 3<>/dev/tcp/localhost/7777; cat >&3; cat <&3; exec 3<&-) | grep 'Multiplayer.4'"
-{{- end -}}
+    {{- end }}
 {{- end -}}
 
 {{/*
@@ -117,9 +117,9 @@ Define the namespace template if set with forceNamespace or .Release.Namespace i
 */}}
 {{- define "terraria.namespace" -}}
 {{- if .Values.forceNamespace -}}
-namespace: {{ .Values.forceNamespace }}
+{{ .Values.forceNamespace }}
 {{- else -}}
-namespace: {{ .Release.Namespace }}
+{{ .Release.Namespace }}
 {{- end -}}
 {{- end -}}
 
@@ -138,43 +138,43 @@ failureThreshold: {{ .failureThreshold }}
 Defines the hex or rgb array color as an rgb list.
 */}}
 {{- define "terraria.rgbColor" -}}
-{{- if kindIs "string" . }}
-  {{- if hasPrefix "#" . }}
-    {{- $hex := trimPrefix "#" . }}
-    {{- if ne (len $hex) 6 }}
-      {{- fail (printf "invalid hex color '%s', must be 7 characters long" .) }}
-    {{- end }}
-    {{- $red := include "terraria.hexToDecimal" (substr 0 2 $hex) }}
-    {{- $green := include "terraria.hexToDecimal" (substr 2 4 $hex) }}
-    {{- $blue := include "terraria.hexToDecimal" (substr 4 6 $hex) }}
-    {{- printf "[%s,%s,%s]" $red $green $blue }}
-  {{- else }}
-    {{- fail (printf "invalid color '%s'" .) }}
+{{- if kindIs "string" . -}}
+  {{- if hasPrefix "#" . -}}
+    {{- $hex := trimPrefix "#" . -}}
+    {{- if ne (len $hex) 6 -}}
+      {{- fail (printf "invalid hex color '%s', must be 7 characters long" .) -}}
+    {{- end -}}
+    {{- $red   := include "terraria.hexToDecimal" (substr 0 2 $hex) -}}
+    {{- $green := include "terraria.hexToDecimal" (substr 2 4 $hex) -}}
+    {{- $blue  := include "terraria.hexToDecimal" (substr 4 6 $hex) -}}
+    {{- printf "[%s,%s,%s]" $red $green $blue -}}
+  {{- else -}}
+    {{- fail (printf "invalid color '%s'" .) -}}
   {{- end }}
 {{- else }}
-  {{- toJson . }}
-{{- end }}
-{{- end }}
+  {{- toJson . -}}
+{{- end -}}
+{{- end -}}
 
 {{/*
 Converts a hex value to decimal.
 */}}
 {{- define "terraria.hexToDecimal" -}}
-{{- $hex := . }}
-{{- $dict := dict "0" 0 "1" 1 "2" 2 "3" 3 "4" 4 "5" 5 "6" 6 "7" 7 "8" 8 "9" 9 "a" 10 "b" 11 "c" 12 "d" 13 "e" 14 "f" 15 }}
-{{- $value := 0 }}
-{{- $chars := reverse (regexSplit "" (lower $hex) -1) }}
-{{- $factor := 1 }}
-{{- range $char := $chars }}
-  {{- $decimal := index $dict $char }}
-  {{- if and (not (eq $char "0")) (not $decimal) }}
-    {{- fail (printf "invalid hex value '%s', contains invalid character '%s'" $hex $char) }}
-  {{- end }}
-  {{- $value = add $value (mul $decimal $factor) }}
-  {{- $factor = mul $factor 16 }}
-{{- end }}
-{{- $value }}
-{{- end }}
+{{- $hex := . -}}
+{{- $dict := dict "0" 0 "1" 1 "2" 2 "3" 3 "4" 4 "5" 5 "6" 6 "7" 7 "8" 8 "9" 9 "a" 10 "b" 11 "c" 12 "d" 13 "e" 14 "f" 15 -}}
+{{- $value := 0 -}}
+{{- $chars := reverse (regexSplit "" (lower $hex) -1) -}}
+{{- $factor := 1 -}}
+{{- range $char := $chars -}}
+  {{- $decimal := index $dict $char -}}
+  {{- if and (not (eq $char "0")) (not $decimal) -}}
+    {{- fail (printf "invalid hex value '%s', contains invalid character '%s'" $hex $char) -}}
+  {{- end -}}
+  {{- $value = add $value (mul $decimal $factor) -}}
+  {{- $factor = mul $factor 16 -}}
+{{- end -}}
+{{- $value -}}
+{{- end -}}
 
 {{/*
 Defines rest application tokens.

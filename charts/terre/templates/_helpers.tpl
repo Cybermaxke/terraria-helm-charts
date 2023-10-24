@@ -66,9 +66,9 @@ Define the namespace template if set with forceNamespace or .Release.Namespace i
 */}}
 {{- define "terre.namespace" -}}
 {{- if .Values.forceNamespace -}}
-namespace: {{ .Values.forceNamespace }}
+{{ .Values.forceNamespace }}
 {{- else -}}
-namespace: {{ .Release.Namespace }}
+{{ .Release.Namespace }}
 {{- end -}}
 {{- end -}}
 

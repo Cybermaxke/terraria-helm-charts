@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# Copy the plugins to where tshock loads them from
+if [ "$(ls -A /home/terraria/server/plugins)" ]; then
+  cp /home/terraria/server/plugins/* /tshock/ServerPlugins/
+fi
+
 # Capture the args first and then pass them to the command, directly using "$@" ignores them
 # shellcheck disable=SC2116
 args=$(echo "$@")
@@ -12,11 +17,9 @@ config=$(echo "$args" | pcregrep -o2 '(^|\s)(-config\s+[^\s]+)')
 if [ -n "$config" ]; then
   args=$(echo "$args" | sed "s@$config@@g")
   config=$(echo "$config" | pcregrep -o1 '\s+([^\s]+)$')
-  cp "$config" "/terraria-server/tmp/serverconfig.txt"
+  cp "$config" "/tshock/tmp/serverconfig.txt"
+  config="/tshock/tmp/serverconfig.txt"
 fi
-
-config="/terraria-server/tmp/serverconfig.txt"
-touch "$config"
 
 # Extract world arg
 world=$(echo "$args" | pcregrep -o2 '(^|\s)(-world\s+[^\s]+)')
@@ -57,11 +60,6 @@ if [ -z "$(echo "$worldpath" | pcregrep '/$')" ]; then
   worldpath="$worldpath/"
 fi
 
-# World directory doesn't start with / so put it relative to the workdir
-if [ -z "$(echo "$worldpath" | pcregrep '/$')" ]; then
-  worldpath="/home/terraria/server/$worldpath"
-fi
-
 if [ -n "$world" ]; then
   # Check if the path is absolute, if not, set it relative to the world directory
   if [ -z "$(echo "$world" | pcregrep '^/')" ]; then
@@ -71,14 +69,32 @@ if [ -n "$world" ]; then
   fi
 fi
 
-echo "worldpath=$worldpath" >> "$config"
-args="$args -config $config"
+# Add new config
+if [ -n "$config" ]; then
+  args="$args -config $config"
+fi
 
+# Default configpath
+if [ -z "$(echo "$args" | pcregrep -o2 '(^|\s)-configpath\s+([^\s]+)')" ]; then
+  args="$args -configpath /home/terraria/server/config"
+fi
+
+# Default logpath
+if [ -z "$(echo "$args" | pcregrep -o2 '(^|\s)-logpath\s+([^\s]+)')" ]; then
+  args="$args -logpath /home/terraria/server/logs"
+fi
+
+echo "ARGS: $args"
+if [ -e "$config" ]; then
+  cat "$config"
+fi
+ls -al /home/terraria/server
+
+# Pipe the stdout of the server through a filter to get rid of the health check messages that are spamming.
 # shellcheck disable=SC2086
-mono --server --gc=sgen -O=all /terraria-server/TerrariaServer.exe $args | \
+/tshock/TShock.Server $args | \
 while read line; do \
   echo $line | \
   grep -v "127\.0\.0\.1:[0-9]* is connecting\.\.\." | \
   grep -v "127\.0\.0\.1:[0-9]* was booted: You are not using the same version as this server\."; \
 done
-

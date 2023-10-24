@@ -1,0 +1,45 @@
+name: Build vanilla images
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - images/vanilla/**
+      - .github/workflows/vanilla-images.yaml
+  workflow_dispatch:
+
+env:
+  platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm64,linux/ppc64le
+  repo: ghcr.io/cybermaxke
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - version: 1.4.4.9
+          - version: 1.4.3.6
+          - version: 1.4.2.3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to Github Packages
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: ./images/vanilla
+          platforms: ${{ env.platforms }}
+          push: true
+          build-args: |
+            TERRARIA_VERSION=${{ matrix.version }}
+          tags: ${{ env.repo }}/terraria:vanilla-${{ matrix.version }}

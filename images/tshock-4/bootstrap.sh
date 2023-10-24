@@ -1,7 +1,9 @@
 #!/bin/sh
 
 # Copy the plugins to where tshock loads them from
-cp /home/terraria/server/plugins/* /tshock/ServerPlugins/
+if [ "$(ls -A /home/terraria/server/plugins)" ]; then
+  cp /home/terraria/server/plugins/* /tshock/ServerPlugins/
+fi
 
 # Capture the args first and then pass them to the command, directly using "$@" ignores them
 # shellcheck disable=SC2116
@@ -83,8 +85,15 @@ if [ -z "$(echo "$args" | pcregrep -o2 '(^|\s)-logpath\s+([^\s]+)')" ]; then
 fi
 
 echo "ARGS: $args"
-cat "$config"
+if [ -e "$config" ]; then
+  cat "$config"
+fi
 ls -al /home/terraria/server
 
 # shellcheck disable=SC2086
-mono --server --gc=sgen -O=all /tshock/TerrariaServer.exe $args
+mono --server --gc=sgen -O=all /tshock/TerrariaServer.exe $args | \
+while read line; do \
+  echo $line | \
+  grep -v "127\.0\.0\.1:[0-9]* is connecting\.\.\." | \
+  grep -v "127\.0\.0\.1:[0-9]* was booted: You are not using the same version as this server\."; \
+done

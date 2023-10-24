@@ -1,1 +1,30 @@
-Thanks for installing Terraria v{{ .Chart.AppVersion }}!
+Thanks for installing Terraria!
+
+{{- $terrariaVersion := .Values.image.terraria.tag | regexFind "1\\.[0-9]\\.[0-9]+(?:\\.[0-9]+)" }}
+
+Release name: {{ .Release.Name }}
+Chart name: {{ .Chart.Name }}
+Chart version: {{ .Chart.Version }}
+Terraria version: {{ $terrariaVersion | default "unknown" }}
+
+{{- $fullname  := include "terraria.fullname" . }}
+{{- $namespace := include "terraria.namespace" . }}
+
+To connect to your Terraria server from inside the cluster, use the following DNS name and port:
+
+  {{ $fullname }}.{{ $namespace }}.svc:{{ .Values.server.service.port }}
+
+{{- if eq .Values.server.service.type "NodePort" }}
+
+{{- $nodePort := .Values.server.service.nodePort }}
+{{- if $nodePort }}
+
+To connect to your Terraria server from outside the cluster, use your external DNS name or IP and the following port: {{ $nodePort }}
+
+{{- else }}
+
+To connect to your Terraria server from outside the cluster, use your external DNS name or IP and the following command to receive the port:
+
+  kubectl get service {{ $fullname }} -n {{ $namespace }} -o jsonpath='{.spec.ports[*].nodePort}'
+{{- end }}
+{{- end }}
