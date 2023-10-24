@@ -48,7 +48,7 @@ FROM mcr.microsoft.com/dotnet/runtime:6.0
 
 LABEL org.opencontainers.image.authors="Seppe Volkaerts <contact@seppevolkaerts.be>"
 LABEL org.opencontainers.image.url="https://github.com/Cybermaxke/terraria-helm-charts"
-LABEL org.opencontainers.image.documentation="tShock $TSHOCK_VERSION for Terraria $TERRARIA_VERSION"
+LABEL org.opencontainers.image.description="tShock $TSHOCK_VERSION for Terraria $TERRARIA_VERSION"
 LABEL org.opencontainers.image.source="https://github.com/Cybermaxke/terraria-helm-charts/blob/master/images/tshock/Dockerfile"
 
 # Server port
