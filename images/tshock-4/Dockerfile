@@ -31,7 +31,9 @@ ARG TSHOCK_VERSION=4.5.18
 # Download and unpack TShock
 RUN RELEASES="https://github.com/Pryaxis/TShock/releases/download" && \
   (wget "$RELEASES/v$TSHOCK_VERSION/TShock${TSHOCK_VERSION}_Terraria${TERRARIA_VERSION}.zip" -O /tshock.zip || \
-   wget "$RELEASES/v$TSHOCK_VERSION/TShock${TSHOCK_VERSION}_Terraria_${TERRARIA_VERSION}.zip" -O /tshock.zip) && \
+   wget "$RELEASES/v$TSHOCK_VERSION/TShock${TSHOCK_VERSION}_Terraria_${TERRARIA_VERSION}.zip" -O /tshock.zip || \
+   wget "$RELEASES/v$TSHOCK_VERSION/TShock_${TSHOCK_VERSION}_Terraria${TERRARIA_VERSION}.zip" -O /tshock.zip || \
+   wget "$RELEASES/v$TSHOCK_VERSION/TShock_${TSHOCK_VERSION}_Terraria_${TERRARIA_VERSION}.zip" -O /tshock.zip) && \
   unzip /tshock.zip -d /tshock && \
   rm /tshock.zip && \
   chmod +x /tshock/TerrariaServer.exe
