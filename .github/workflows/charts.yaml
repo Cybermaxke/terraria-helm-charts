@@ -29,7 +29,6 @@ jobs:
           helm repo add terraria https://cybermaxke.github.io/terraria-helm-charts
       - name: Release Charts
         uses: helm/chart-releaser-action@v1.5.0
-        with:
-          skip_existing: true
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          CR_SKIP_EXISTING: true
