@@ -1,4 +1,4 @@
-name: Build vanilla images
+name: Build Vanilla Images
 
 on:
   push:
@@ -15,6 +15,7 @@ env:
 
 jobs:
   build:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         include:

@@ -1,4 +1,4 @@
-name: Build tools image
+name: Build Tools Image
 
 on:
   push:
@@ -15,6 +15,7 @@ env:
 
 jobs:
   build:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
