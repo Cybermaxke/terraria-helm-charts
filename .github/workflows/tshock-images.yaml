@@ -5,7 +5,8 @@ on:
     branches:
       - master
     paths:
-      - images/tshock/**
+      - images/tshock-4/**
+      - images/tshock-5/**
       - .github/workflows/tshock-images.yaml
   workflow_dispatch:
 
