@@ -35,6 +35,31 @@ if [ -z "$world" ] && [ -n "$config" ]; then
   fi
 fi
 
+# Since 1.4.5, the autocreate flag is required when generating a new world
+
+# Extract autocreate arg
+autocreate=$(echo "$args" | pcregrep -o2 '(^|\s)(-autocreate\s+[^\s]+)')
+if [ -n "$autocreate" ]; then
+  args=$(echo "$args" | sed "s@$autocreate@@g")
+  autocreate=$(echo "$autocreate" | pcregrep -o1 '\s+([^\s]+)$')
+fi
+
+# No autocreate is set through args, check the config
+if [ -z "$autocreate" ] && [ -n "$config" ]; then
+  echo "Check config autocreate"
+  autocreate=$(cat "$config" | pcregrep -o1 '^(\s*autocreate\s*=\s*[^\s]+)')
+  if [ -n "$autocreate" ]; then
+    autocreate=$(echo "$autocreate" | pcregrep -o1 '=\s*([^\s]+)')
+  fi
+fi
+
+if [ -z "$autocreate" ]; then
+  echo "Fallback to default autocreate (3: large)"
+  autocreate="3"
+fi
+
+args="$args -autocreate $autocreate"
+
 worldpath=$(echo "$args" | pcregrep -o2 '(^|\s)-worldpath\s+([^\s]+)')
 # No world directory is set through args, check the config
 if [ -z "$worldpath" ] && [ -n "$config" ]; then
@@ -75,7 +100,7 @@ echo "worldpath=$worldpath" >> "$config"
 args="$args -config $config"
 
 # shellcheck disable=SC2086
-mono --server --gc=sgen -O=all /terraria-server/TerrariaServer.exe $args | \
+/terraria-server/TerrariaServer.bin.x86_64 $args | \
 while read line; do \
   echo $line | \
   grep -v "127\.0\.0\.1:[0-9]* is connecting\.\.\." | \

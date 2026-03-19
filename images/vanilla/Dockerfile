@@ -34,7 +34,7 @@ RUN wget https://terraria.org/api/download/pc-dedicated-server/terraria-server-$
   chmod +x /terraria-server/TerrariaServer.exe && \
   chmod +x /terraria-server/TerrariaServer.bin.x86_64
 
-FROM mono:6.12-slim
+FROM debian:bookworm-slim
 
 LABEL org.opencontainers.image.authors="Seppe Volkaerts <contact@seppevolkaerts.be>"
 LABEL org.opencontainers.image.url="https://github.com/Cybermaxke/terraria-helm-charts"

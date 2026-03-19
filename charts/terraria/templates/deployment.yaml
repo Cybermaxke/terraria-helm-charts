@@ -100,9 +100,6 @@ spec:
             {{- if include "terraria.tshock" . }}
             - -killinactivesocket
             - -asyncmono
-            {{- with .Values.server.maxConnectionsPerIP }}
-            - -connperip {{ . }}
-            {{- end }}
             {{- if .Values.server.forceUpdates }}
             - -forceupdate
             {{- end }}

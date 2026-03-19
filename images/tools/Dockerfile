@@ -1,4 +1,4 @@
-FROM alpine:3.18
+FROM alpine:3.23.3
 
 LABEL org.opencontainers.image.authors="Seppe Volkaerts <contact@seppevolkaerts.be>"
 LABEL org.opencontainers.image.url="https://github.com/Cybermaxke/terraria-helm-charts"

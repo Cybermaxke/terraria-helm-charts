@@ -1,10 +1,5 @@
 #!/bin/sh
 
-# Copy the plugins to where tshock loads them from
-if [ "$(ls -A /home/terraria/server/plugins)" ]; then
-  cp /home/terraria/server/plugins/* /tshock/ServerPlugins/
-fi
-
 # Capture the args first and then pass them to the command, directly using "$@" ignores them
 # shellcheck disable=SC2116
 args=$(echo "$@")
@@ -82,6 +77,11 @@ fi
 # Default logpath
 if [ -z "$(echo "$args" | pcregrep -o2 '(^|\s)-logpath\s+([^\s]+)')" ]; then
   args="$args -logpath /home/terraria/server/logs"
+fi
+
+# Default additional plugins
+if [ -z "$(echo "$args" | pcregrep -o2 '(^|\s)-additionalplugins\s+([^\s]+)')" ]; then
+  args="$args -additionalplugins /home/terraria/server/plugins"
 fi
 
 echo "ARGS: $args"

@@ -49,15 +49,13 @@ server:
 
   # Maximum number of allowed players
   maxPlayers:
+
     # Default number of max players, for non-reserved player slots
     base: 8
 
     # Number of reserved player slots past the default that can be joined by reserved players
     #  tshock-only
     reserved: 20
-
-  # The maximum number of connections per IP, or no limit if null
-  maxConnectionsPerIP: null
 
   # Password of the server
   password: null
@@ -87,6 +85,20 @@ hardcoreOnly: false
 #  tshock-only
 mediumcoreOnly: false
 
+# Prevents non-softcore players from connecting
+#  tshock-only
+softcoreOnly: false
+
+# PvP
+#  tshock-only
+pvp:
+
+  # PvP mode: normal, always, pvpWithNoTeam, disabled
+  mode: normal
+
+  # Disables the effect of invisibility potions while PvP is enabled by turning the player visible to the other clients.
+  allowInvisibility: true
+
 # Spawn protection
 #  tshock-only
 spawnProtection:
@@ -96,6 +108,16 @@ spawnProtection:
 
   # Tile radius around the spawn tile
   radius: 10
+
+# Region protection
+#  tshock-only
+regionProtection:
+
+  # If region protection should apply to chests.
+  protectChests: false
+
+  # If region protection should apply to gem locks.
+  protectGemLocks: false
 
 # Hardmode
 #  tshock-only
@@ -139,6 +161,26 @@ world:
   # take longer to settle
   slowLiquids: false
 
+  # Determines the size of invasion events.
+  # The equation for calculating invasion size is: 100 + (multiplier * (number of active players with greater than 200 health)).
+  #  tshock-only
+  invasionMultiplier: 1
+
+  # If clown bomb projectiles can spawn
+  #  tshock-only
+  clownBombsEnabled: true
+
+  # If clown bomb projectiles can spawn
+  #  tshock-only
+  snowBallsEnabled: true
+
+  # If tombstones can spawn on a player death
+  #  tshock-only
+  tombstonesEnabled: true
+
+  # Forces the world time to be normal, day, or night.
+  forceTime: normal
+
   # If auto save is enabled
   #  tshock-only, cannot be disabled for the vanilla image
   autoSave: true
@@ -154,6 +196,10 @@ world:
   # Whether to save the world when the last player disconnects
   #  tshock-only
   saveOnLastPlayerExit: true
+
+  # Tile provider implementation to use: heaptile, constileation, default
+  #  tshock-only
+  tileProvider: default
 
   # World backup, backups are stored next to the world file under a backup directory
   #  tshock-only
@@ -320,8 +366,8 @@ image:
 
   # The tools image
   tools:
-    repository: cybermaxke/tools
-    tag: alpine-3.14.2
+    repository: ghcr.io/cybermaxke/tools
+    tag: latest
     # The pull policy, image.pullPolicy is used if not set
     pullPolicy: null
 
