@@ -39,12 +39,15 @@ RUN RELEASES="https://github.com/Pryaxis/TShock/releases/download" && \
   chmod +x /tshock/TerrariaServer.exe
 
 # Cannot be the slim version, plugins may have dependencies
-FROM mono:6.12
+FROM debian:bookworm
+
+ARG TERRARIA_VERSION
+ARG TSHOCK_VERSION
 
 LABEL org.opencontainers.image.authors="Seppe Volkaerts <contact@seppevolkaerts.be>"
 LABEL org.opencontainers.image.url="https://github.com/Cybermaxke/terraria-helm-charts"
 LABEL org.opencontainers.image.description="tShock $TSHOCK_VERSION for Terraria $TERRARIA_VERSION"
-LABEL org.opencontainers.image.source="https://github.com/Cybermaxke/terraria-helm-charts/blob/master/images/tshock/Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/Cybermaxke/terraria-helm-charts/blob/master/images/tshock-4/Dockerfile"
 
 # Server port
 EXPOSE 7777
@@ -62,7 +65,7 @@ RUN groupadd terraria -g $TERRARIA_GID && \
   useradd terraria -m -u $TERRARIA_UID -g $TERRARIA_GID && \
   apt-get update -y && \
   # Install nuget to grab TShock dependencies
-  apt-get install -y nuget pcregrep && \
+  apt-get install -y mono-complete ca-certificates nuget pcregrep && \
   rm -rf /var/lib/apt/lists* /tmp/* && \
   # The bootstrap script needs to be able to copy plugins to the ServerPlugins directory
   chown terraria:terraria /tshock/ServerPlugins && \

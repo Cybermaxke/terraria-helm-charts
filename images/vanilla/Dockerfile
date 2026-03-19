@@ -36,9 +36,11 @@ RUN wget https://terraria.org/api/download/pc-dedicated-server/terraria-server-$
 
 FROM debian:bookworm-slim
 
+ARG TERRARIA_VERSION
+
 LABEL org.opencontainers.image.authors="Seppe Volkaerts <contact@seppevolkaerts.be>"
 LABEL org.opencontainers.image.url="https://github.com/Cybermaxke/terraria-helm-charts"
-LABEL org.opencontainers.image.description="Dockerfile for Terraria"
+LABEL org.opencontainers.image.description="Terraria $TERRARIA_VERSION"
 LABEL org.opencontainers.image.source="https://github.com/Cybermaxke/terraria-helm-charts/blob/master/images/vanilla/Dockerfile"
 
 EXPOSE 7777

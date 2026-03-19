@@ -83,7 +83,7 @@ data:
         "ForceTime": {{ not .Values.world.forceTime }},
         "WorldTileProvider": "{{ .Values.world.tileProvider | default "default" }}",
         "InvasionMultiplier": {{ .Values.world.invasionMultiplier }},
-        "PvPMode": {{ lower .Values.pvp.mode }},
+        "PvPMode": "{{ lower .Values.pvp.mode | default "normal" }}",
         "RegionProtectChests": {{ .Values.regionProtection.protectChests }},
         "RegionProtectGemLocks": {{ .Values.regionProtection.protectGemLocks }},
         {{- /* Backup and Save */}}

@@ -46,10 +46,13 @@ RUN set -eux; \
 
 FROM mcr.microsoft.com/dotnet/runtime:6.0
 
+ARG TERRARIA_VERSION
+ARG TSHOCK_VERSION
+
 LABEL org.opencontainers.image.authors="Seppe Volkaerts <contact@seppevolkaerts.be>"
 LABEL org.opencontainers.image.url="https://github.com/Cybermaxke/terraria-helm-charts"
 LABEL org.opencontainers.image.description="tShock $TSHOCK_VERSION for Terraria $TERRARIA_VERSION"
-LABEL org.opencontainers.image.source="https://github.com/Cybermaxke/terraria-helm-charts/blob/master/images/tshock/Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/Cybermaxke/terraria-helm-charts/blob/master/images/tshock-5/Dockerfile"
 
 # Server port
 EXPOSE 7777
