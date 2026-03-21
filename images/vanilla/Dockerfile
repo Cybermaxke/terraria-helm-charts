@@ -37,6 +37,7 @@ RUN wget https://terraria.org/api/download/pc-dedicated-server/terraria-server-$
 FROM debian:bookworm-slim
 
 ARG TERRARIA_VERSION
+ARG TARGETARCH
 
 LABEL org.opencontainers.image.authors="Seppe Volkaerts <contact@seppevolkaerts.be>"
 LABEL org.opencontainers.image.url="https://github.com/Cybermaxke/terraria-helm-charts"
@@ -55,6 +56,11 @@ RUN groupadd terraria -g $TERRARIA_GID && \
   useradd terraria -m -u $TERRARIA_UID -g $TERRARIA_GID && \
   apt-get update -y && \
   apt-get install -y pcregrep && \
+  if [ "${TARGETARCH}" = "arm64" ] || [ "${TARGETARCH}" = "arm" ]; then \
+    apt-get install -y mono-runtime ca-certificates; \
+    # The provided system.dll form terraria doesn't match the mono version.
+    mv /terraria-server/System.dll /usr/lib/mono/4.5/System.dll; \
+  fi && \
   rm -rf /var/lib/apt/lists* /tmp* && \
   mkdir /terraria-server/tmp && \
   chown terraria:terraria /terraria-server/tmp
@@ -73,4 +79,4 @@ RUN mkdir worlds && \
   mkdir logs && \
   mkdir config
 
-ENTRYPOINT [ "/bin/sh", "/terraria-server/bootstrap.sh" ]
+ENTRYPOINT [ "/bin/bash", "/terraria-server/bootstrap.sh" ]

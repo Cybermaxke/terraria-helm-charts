@@ -24,6 +24,9 @@ spec:
         runAsNonRoot: true
         allowPrivilegeEscalation: false
         readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
       command:
         - sh
         - -c

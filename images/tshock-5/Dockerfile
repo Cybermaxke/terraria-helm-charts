@@ -31,14 +31,18 @@ ARG TSHOCK_VERSION=5.2
 RUN set -eux; \
   ARCH="$(apk --print-arch)"; \
   case "$ARCH" in \
-    'x86_64') ARCH=x64 ;; \
-    'aarch64') ARCH=arm64 ;; \
+    'x86_64') ARCH_CANDIDATES="x64 amd64" ;; \
+    'aarch64') ARCH_CANDIDATES="arm64" ;; \
     *) echo >&2 "error: unsupported architecture '$ARCH'."; exit 1 ;; \
   esac; \
   RELEASES="https://github.com/Pryaxis/TShock/releases/download"; \
-  (wget "$RELEASES/v${TSHOCK_VERSION}/TShock-$TSHOCK_VERSION-for-Terraria-$TERRARIA_VERSION-linux-$ARCH-Release.zip" -O /tshock.zip || \
-   wget "$RELEASES/v${TSHOCK_VERSION}.0/TShock-$TSHOCK_VERSION-for-Terraria-$TERRARIA_VERSION-linux-$ARCH-Release.zip" -O /tshock.zip || \
-   wget "$RELEASES/v${TSHOCK_VERSION}/TShock-$(echo $TSHOCK_VERSION | sed -e 's/\.0$//')-for-Terraria-$TERRARIA_VERSION-linux-$ARCH-Release.zip" -O /tshock.zip); \
+  success=""; \
+  for ARCH in $ARCH_CANDIDATES; do \
+    (wget "$RELEASES/v${TSHOCK_VERSION}/TShock-$TSHOCK_VERSION-for-Terraria-$TERRARIA_VERSION-linux-$ARCH-Release.zip" -O /tshock.zip || \
+     wget "$RELEASES/v${TSHOCK_VERSION}.0/TShock-$TSHOCK_VERSION-for-Terraria-$TERRARIA_VERSION-linux-$ARCH-Release.zip" -O /tshock.zip || \
+     wget "$RELEASES/v${TSHOCK_VERSION}/TShock-$(echo $TSHOCK_VERSION | sed -e 's/\.0$//')-for-Terraria-$TERRARIA_VERSION-linux-$ARCH-Release.zip" -O /tshock.zip) && success=1 && break || true; \
+  done; \
+  [ -n "$success" ] || (echo "Download failed for all architectures" && exit 1); \
   unzip /tshock.zip -d /tshock; \
   rm /tshock.zip; \
   tar -xvf /tshock/*.tar -C /tshock; \
@@ -95,4 +99,4 @@ RUN mkdir worlds && \
   mkdir plugins && \
   mkdir tshock
 
-ENTRYPOINT [ "/bin/sh", "/tshock/bootstrap.sh" ]
+ENTRYPOINT [ "/bin/bash", "/tshock/bootstrap.sh" ]

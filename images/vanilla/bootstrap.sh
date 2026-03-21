@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Capture the args first and then pass them to the command, directly using "$@" ignores them
 # shellcheck disable=SC2116
@@ -99,11 +99,34 @@ fi
 echo "worldpath=$worldpath" >> "$config"
 args="$args -config $config"
 
-# shellcheck disable=SC2086
-/terraria-server/TerrariaServer.bin.x86_64 $args | \
-while read line; do \
-  echo $line | \
-  grep -v "127\.0\.0\.1:[0-9]* is connecting\.\.\." | \
-  grep -v "127\.0\.0\.1:[0-9]* was booted: You are not using the same version as this server\."; \
-done
+if command -v mono >/dev/null 2>&1; then
+  cmd="mono --server --gc=sgen -O=all /terraria-server/TerrariaServer.exe"
+else
+  cmd="/terraria-server/TerrariaServer.bin.x86_64"
+fi
 
+_term() {
+  echo "SIGTERM/SIGINT received, shutting down server..."
+  # Send 'exit' command to stdin if available, this will save and exit
+  echo "exit" >&4 2>/dev/null || true
+  # Wait for the server to exit
+  wait $server_pid
+  exit 0
+}
+
+trap _term SIGTERM SIGINT
+
+live=/home/terraria/server/live
+# Create dedicated file descriptor for server stdin
+exec 4<> <(:)
+$cmd $args > >(while IFS= read -r line; do
+  case "$line" in
+    *"Listening on port "[0-9]*)
+      [ -f $live ] || touch $live
+      ;;
+  esac
+  printf '%s\n' "$line"
+done) 2>&1 <&4 &
+server_pid=$!
+
+wait $server_pid

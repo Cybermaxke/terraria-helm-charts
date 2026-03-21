@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# Copy the plugins to where tshock loads them from
-if [ "$(ls -A /home/terraria/server/plugins)" ]; then
-  cp /home/terraria/server/plugins/* /tshock/ServerPlugins/
-fi
-
 # Capture the args first and then pass them to the command, directly using "$@" ignores them
 # shellcheck disable=SC2116
 args=$(echo "$@")
@@ -37,6 +32,31 @@ if [ -z "$world" ] && [ -n "$config" ]; then
     world=$(echo "$world" | pcregrep -o1 '=\s*([^\s]+)')
   fi
 fi
+
+# Since 1.4.5, the autocreate flag is required when generating a new world
+
+# Extract autocreate arg
+autocreate=$(echo "$args" | pcregrep -o2 '(^|\s)(-autocreate\s+[^\s]+)')
+if [ -n "$autocreate" ]; then
+  args=$(echo "$args" | sed "s@$autocreate@@g")
+  autocreate=$(echo "$autocreate" | pcregrep -o1 '\s+([^\s]+)$')
+fi
+
+# No autocreate is set through args, check the config
+if [ -z "$autocreate" ] && [ -n "$config" ]; then
+  echo "Check config autocreate"
+  autocreate=$(cat "$config" | pcregrep -o1 '^(\s*autocreate\s*=\s*[^\s]+)')
+  if [ -n "$autocreate" ]; then
+    autocreate=$(echo "$autocreate" | pcregrep -o1 '=\s*([^\s]+)')
+  fi
+fi
+
+if [ -z "$autocreate" ]; then
+  echo "Fallback to default autocreate (3: large)"
+  autocreate="3"
+fi
+
+args="$args -autocreate $autocreate"
 
 worldpath=$(echo "$args" | pcregrep -o2 '(^|\s)-worldpath\s+([^\s]+)')
 # No world directory is set through args, check the config
@@ -84,7 +104,12 @@ if [ -z "$(echo "$args" | pcregrep -o2 '(^|\s)-logpath\s+([^\s]+)')" ]; then
   args="$args -logpath /home/terraria/server/logs"
 fi
 
-cmd="mono --server --gc=sgen -O=all /tshock/TerrariaServer.exe"
+# Default additional plugins
+if [ -z "$(echo "$args" | pcregrep -o2 '(^|\s)-additionalplugins\s+([^\s]+)')" ]; then
+  args="$args -additionalplugins /home/terraria/server/plugins"
+fi
+
+cmd="/tshock/TShock.Server"
 
 _term() {
   echo "SIGTERM/SIGINT received, shutting down server..."

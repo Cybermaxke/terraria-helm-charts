@@ -25,21 +25,27 @@ FROM alpine:latest AS base
 
 RUN apk add --update-cache unzip
 
-ARG TERRARIA_VERSION=1.4.3.6
-ARG TSHOCK_VERSION=4.5.18
+ARG TERRARIA_VERSION=1.4.5.6
+ARG TSHOCK_VERSION=6.1
 
-# Download and unpack TShock
-RUN RELEASES="https://github.com/Pryaxis/TShock/releases/download" && \
-  (wget "$RELEASES/v$TSHOCK_VERSION/TShock${TSHOCK_VERSION}_Terraria${TERRARIA_VERSION}.zip" -O /tshock.zip || \
-   wget "$RELEASES/v$TSHOCK_VERSION/TShock${TSHOCK_VERSION}_Terraria_${TERRARIA_VERSION}.zip" -O /tshock.zip || \
-   wget "$RELEASES/v$TSHOCK_VERSION/TShock_${TSHOCK_VERSION}_Terraria${TERRARIA_VERSION}.zip" -O /tshock.zip || \
-   wget "$RELEASES/v$TSHOCK_VERSION/TShock_${TSHOCK_VERSION}_Terraria_${TERRARIA_VERSION}.zip" -O /tshock.zip) && \
-  unzip /tshock.zip -d /tshock && \
-  rm /tshock.zip && \
-  chmod +x /tshock/TerrariaServer.exe
+RUN set -eux; \
+  ARCH="$(apk --print-arch)"; \
+  case "$ARCH" in \
+    'x86_64') ARCH=x64 ;; \
+    'aarch64') ARCH=arm64 ;; \
+    'armv7'|'armhf'|'armv6') ARCH=arm ;; \
+    *) echo >&2 "error: unsupported architecture '$ARCH'."; exit 1 ;; \
+  esac; \
+  RELEASES="https://github.com/Pryaxis/TShock/releases/download"; \
+  (wget "$RELEASES/v${TSHOCK_VERSION}/TShock-$TSHOCK_VERSION-for-Terraria-$TERRARIA_VERSION-linux-$ARCH-Release.zip" -O /tshock.zip || \
+   wget "$RELEASES/v${TSHOCK_VERSION}.0/TShock-$TSHOCK_VERSION-for-Terraria-$TERRARIA_VERSION-linux-$ARCH-Release.zip" -O /tshock.zip || \
+   wget "$RELEASES/v${TSHOCK_VERSION}/TShock-$(echo $TSHOCK_VERSION | sed -e 's/\.0$//')-for-Terraria-$TERRARIA_VERSION-linux-$ARCH-Release.zip" -O /tshock.zip); \
+  unzip /tshock.zip -d /tshock; \
+  rm /tshock.zip; \
+  tar -xvf /tshock/*.tar -C /tshock; \
+  rm /tshock/*.tar
 
-# Cannot be the slim version, plugins may have dependencies
-FROM debian:bookworm
+FROM mcr.microsoft.com/dotnet/runtime:9.0
 
 ARG TERRARIA_VERSION
 ARG TSHOCK_VERSION
@@ -47,7 +53,7 @@ ARG TSHOCK_VERSION
 LABEL org.opencontainers.image.authors="Seppe Volkaerts <contact@seppevolkaerts.be>"
 LABEL org.opencontainers.image.url="https://github.com/Cybermaxke/terraria-helm-charts"
 LABEL org.opencontainers.image.description="tShock $TSHOCK_VERSION for Terraria $TERRARIA_VERSION"
-LABEL org.opencontainers.image.source="https://github.com/Cybermaxke/terraria-helm-charts/blob/master/images/tshock-4/Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/Cybermaxke/terraria-helm-charts/blob/master/images/tshock-6/Dockerfile"
 
 # Server port
 EXPOSE 7777
@@ -65,17 +71,16 @@ RUN groupadd terraria -g $TERRARIA_GID && \
   useradd terraria -m -u $TERRARIA_UID -g $TERRARIA_GID && \
   apt-get update -y && \
   # Install nuget to grab TShock dependencies
-  apt-get install -y mono-complete ca-certificates nuget pcregrep && \
+  apt-get install -y nuget pcregrep && \
   rm -rf /var/lib/apt/lists* /tmp/* && \
-  # The bootstrap script needs to be able to copy plugins to the ServerPlugins directory
-  chown terraria:terraria /tshock/ServerPlugins && \
   mkdir /tshock/tmp && \
-  chown terraria:terraria /tshock/tmp && \
+  chmod +x /tshock/TShock.Server && \
   chmod +x /tshock/bootstrap.sh
 
 WORKDIR /home/terraria/server
 
-RUN chown -R terraria:terraria .
+RUN chown -R terraria:terraria . && \
+    chown -R terraria:terraria /tshock
 
 USER terraria
 

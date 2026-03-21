@@ -23,6 +23,8 @@ spec:
         runAsUser: 65534
         runAsGroup: 65534
         fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
       volumes:
         - name: tmp
           emptyDir: {}
@@ -46,6 +48,9 @@ spec:
             runAsNonRoot: true
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           image: "{{ tpl .Values.image.terre.repository . }}:{{ tpl .Values.image.terre.tag . }}"
           imagePullPolicy: {{ default .Values.image.pullPolicy .Values.image.terre.pullPolicy }}
           env:

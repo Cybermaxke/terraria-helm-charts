@@ -7,11 +7,13 @@ on:
     paths:
       - images/tshock-4/**
       - images/tshock-5/**
+      - images/tshock-6/**
       - .github/workflows/tshock-images.yaml
   workflow_dispatch:
 
 env:
   platforms: linux/amd64,linux/arm64
+  platforms6: linux/amd64,linux/arm64,linux/arm/v7
   repo: ghcr.io/cybermaxke
 
 jobs:
@@ -20,8 +22,10 @@ jobs:
     strategy:
       matrix:
         include:
+          - version: 1.4.5.6
+            tshock: 6.1.0
           - version: 1.4.4.9
-            tshock: 5.2.0
+            tshock: 5.2.4
           - version: 1.4.3.6
             tshock: 4.5.16
           - version: 1.4.2.3
@@ -42,8 +46,12 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v7
         with:
-          context: ./images/tshock-${{ startsWith(matrix.tshock, '5.') && '5' || '4' }}
-          platforms: ${{ env.platforms }}
+          context: ./images/tshock-${{
+              startsWith(matrix.tshock, '6.') && '6' ||
+              startsWith(matrix.tshock, '5.') && '5' ||
+              '4'
+            }}
+          platforms: ${{ startsWith(matrix.tshock, '6.') && env.platforms6 || env.platforms }}
           push: true
           build-args: |
             TERRARIA_VERSION=${{ matrix.version }}

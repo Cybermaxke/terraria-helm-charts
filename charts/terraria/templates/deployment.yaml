@@ -24,6 +24,8 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       volumes:
         - name: server-config
           configMap:
@@ -75,6 +77,13 @@ spec:
             - |
               cp /tshock-config/config.json /config
               echo "Copied tshock config file"
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           volumeMounts:
             - name: config
               mountPath: /config
@@ -89,6 +98,9 @@ spec:
             runAsNonRoot: true
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
           {{- /* Stdin must be set to true, or the container will crash after generating the world */}}
           stdin: true
           args:

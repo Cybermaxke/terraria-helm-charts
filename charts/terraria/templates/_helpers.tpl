@@ -79,24 +79,13 @@ echo 'DAABCExpdmVuZXNz' | base64 -d
 
 {{/*
 Checks if the terraria server is accepting connections.
-Sends a "connection request" packet with "Liveness" as version (base64 encoded string), the server
-should respond with "Multiplayer.4" which is a version mismatch disconnect message.
 */}}
 {{- define "terraria.livenessCheck" -}}
 exec:
   command:
-    - bash
-    - -c
-    {{- /*
-    The save on last player exit feature interferes with the packet, which causes a save for every
-    packet. So only check if the tcp port is available in that case. We are not using the tcpSocket
-    health probe directly so we can send requests from localhost which gets filtered out in the logs.
-    */ -}}
-    {{- if and (include "terraria.tshock" .) .Values.world.saveOnLastPlayerExit }}
-    - "echo >/dev/tcp/localhost/7777"
-    {{- else }}
-    - "{{ include "terraria.livenessPacket" . }} | (exec 3<>/dev/tcp/localhost/7777; cat >&3; cat <&3; exec 3<&-) | grep 'Multiplayer.4'"
-    {{- end }}
+    - test
+    - -f
+    - /home/terraria/server/live
 {{- end -}}
 
 {{/*
