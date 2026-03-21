@@ -73,8 +73,7 @@ ARG TERRARIA_UID=1000
 RUN groupadd terraria -g $TERRARIA_GID && \
   useradd terraria -m -u $TERRARIA_UID -g $TERRARIA_GID && \
   apt-get update -y && \
-  # Install nuget to grab TShock dependencies
-  apt-get install -y nuget pcregrep && \
+  apt-get install -y pcregrep && \
   rm -rf /var/lib/apt/lists* /tmp/* && \
   mkdir /tshock/tmp && \
   chmod +x /tshock/TShock.Server && \

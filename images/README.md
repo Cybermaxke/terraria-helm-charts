@@ -30,3 +30,9 @@ docker build images/tools    --tag ghcr.io/cybermaxke/tools:latest
 ```
 docker build images/tshock-5 --tag ghcr.io/cybermaxke/terraria:tshock-1.4.4.9-5.2.0 --build-arg TERRARIA_VERSION=1.4.4.9 --build-arg TSHOCK_VERSION=5.2.0
 ```
+
+### Using buildx for multiple architectures
+```
+docker buildx build images/tshock-4 --tag ghcr.io/cybermaxke/terraria:tshock-1.4.3.6 --platform linux/amd64,linux/arm64 --build-arg TERRARIA_VERSION=1.4.3.6 --build-arg TSHOCK_VERSION=4.5.18
+docker buildx build images/tshock-5 --tag ghcr.io/cybermaxke/terraria:tshock-1.4.4.9 --platform linux/amd64,linux/arm64 --build-arg TERRARIA_VERSION=1.4.4.9 --build-arg TSHOCK_VERSION=5.2.4
+```
