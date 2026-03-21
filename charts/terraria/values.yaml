@@ -359,7 +359,7 @@ image:
     repository: ghcr.io/cybermaxke/terraria
 
     # The image (Terraria/tShock version) to deploy
-    tag: tshock-1.4.4.9
+    tag: tshock-1.4.5.6
 
     # The pull policy, image.pullPolicy is used if not set
     pullPolicy: null
