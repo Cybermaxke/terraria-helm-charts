@@ -101,8 +101,10 @@ spec:
             capabilities:
               drop:
                 - ALL
-          {{- /* Stdin must be set to true, or the container will crash after generating the world */}}
+          {{- if .Values.server.interactiveConsole }}
           stdin: true
+          tty: true
+          {{- end }}
           args:
             - -config serverconfig.txt
             - -announcementboxrange '{{ default -1 .Values.announcementBox.range }}'

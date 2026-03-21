@@ -35,6 +35,10 @@ server:
   # If debug messages should be logged
   debugLoggingEnabled: false
 
+  # If the interactive console should be enabled, if enabled it is possible to attach to the
+  # server container and execute commands. See `kubectl attach <pod> [-c <container>]`
+  interactiveConsole: true
+
   # Language of the server:
   #  - English = en-US
   #  - German = de-DE
@@ -42,9 +46,12 @@ server:
   #  - French = fr-FR
   #  - Spanish = es-ES
   #  - Russian = ru-RU
-  #  - Chinese = zh-Hans
+  #  - Traditional Chinese = zh-TW (since 1.4.5)
+  #  - Simplified Chinese = zh-Hans
   #  - Portuguese = pt-BR
   #  - Polish = pl-PL
+  #  - Japanese = ja-JP (since 1.4.5)
+  #  - Korean = ko-KR (since 1.4.5)
   language: en-US
 
   # Maximum number of allowed players

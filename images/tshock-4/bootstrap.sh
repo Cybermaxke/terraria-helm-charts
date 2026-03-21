@@ -87,15 +87,20 @@ fi
 cmd="mono --server --gc=sgen -O=all /tshock/TerrariaServer.exe"
 
 _term() {
-  echo "SIGTERM/SIGINT received, shutting down server..."
-  # Send 'exit' command to stdin if available, this will save and exit
+  echo "SIGTERM received, shutting down server..."
+  # Shutdown the stdin copy process first
+  kill $stdin_pid 2>/dev/null || true
+  wait $stdin_pid 2>/dev/null || true
+  # Send 'exit' command to server stdin if available, this will save and exit
   echo "exit" >&4 2>/dev/null || true
   # Wait for the server to exit
   wait $server_pid
   exit 0
 }
 
-trap _term SIGTERM SIGINT
+trap _term SIGTERM
+# Prevent Ctrl-C in the interactive shell from stopping the server
+trap '' SIGINT
 
 live=/home/terraria/server/live
 # Create dedicated file descriptor for server stdin
@@ -109,5 +114,9 @@ $cmd $args > >(while IFS= read -r line; do
   printf '%s\n' "$line"
 done) 2>&1 <&4 &
 server_pid=$!
+
+# Copy from stdin to the server stdin
+cat <&0 >&4 &
+stdin_pid=$!
 
 wait $server_pid
