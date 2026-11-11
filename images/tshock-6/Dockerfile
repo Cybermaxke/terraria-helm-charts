@@ -25,8 +25,8 @@ FROM alpine:latest AS base
 
 RUN apk add --update-cache unzip
 
-ARG TERRARIA_VERSION=1.4.5.6
-ARG TSHOCK_VERSION=6.1
+ARG TERRARIA_VERSION=1.4.5.8
+ARG TSHOCK_VERSION=6.2.1
 
 RUN set -eux; \
   ARCH="$(apk --print-arch)"; \

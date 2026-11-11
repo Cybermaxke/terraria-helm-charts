@@ -21,8 +21,10 @@ The helm charts expect images with these modifications and will not work properl
 docker build images/tshock-4 --tag ghcr.io/cybermaxke/terraria:tshock-1.4.3.6  --build-arg TERRARIA_VERSION=1.4.3.6 --build-arg TSHOCK_VERSION=4.5.18
 docker build images/tshock-5 --tag ghcr.io/cybermaxke/terraria:tshock-1.4.4.9  --build-arg TERRARIA_VERSION=1.4.4.9 --build-arg TSHOCK_VERSION=5.2.4
 docker build images/tshock-6 --tag ghcr.io/cybermaxke/terraria:tshock-1.4.5.6  --build-arg TERRARIA_VERSION=1.4.5.6 --build-arg TSHOCK_VERSION=6.1.0
+docker build images/tshock-6 --tag ghcr.io/cybermaxke/terraria:tshock-1.4.5.8  --build-arg TERRARIA_VERSION=1.4.5.8 --build-arg TSHOCK_VERSION=6.2.1
 docker build images/vanilla  --tag ghcr.io/cybermaxke/terraria:vanilla-1.4.4.9 --build-arg TERRARIA_VERSION=1.4.4.9
 docker build images/vanilla  --tag ghcr.io/cybermaxke/terraria:vanilla-1.4.5.6 --build-arg TERRARIA_VERSION=1.4.5.6
+docker build images/vanilla  --tag ghcr.io/cybermaxke/terraria:vanilla-1.4.5.8 --build-arg TERRARIA_VERSION=1.4.5.8
 docker build images/tools    --tag ghcr.io/cybermaxke/tools:latest
 ```
 
