@@ -26,7 +26,7 @@ overriding the version can be done using the following value:
 ```yaml
 image:
   terraria:
-    tag: tshock-1.4.5.6
+    tag: tshock-1.4.5.8
 ```
 By default, are tShock images used, using the vanilla image will restrict the usage of values 
 that are tShock only. Some values may also not work with older/newer versions.
@@ -44,6 +44,8 @@ The following table contains image tags that are compatible with the latest char
 
 | Terraria version | tShock version | Tags                                      |
 |------------------|----------------|-------------------------------------------|
+| 1.4.5.8          |                | `vanilla-1.4.5.8`                         |
+| 1.4.5.8          | 6.2.1          | `tshock-1.4.5.8`, `tshock-1.4.5.8-6.2.1`  |
 | 1.4.5.6          |                | `vanilla-1.4.5.6`                         |
 | 1.4.5.6          | 6.1.0          | `tshock-1.4.5.6`, `tshock-1.4.5.6-6.1.0`  |
 | 1.4.4.9          |                | `vanilla-1.4.4.9`                         |
